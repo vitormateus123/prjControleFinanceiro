@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from services.supabase_client import supabase
+from services.supabase_client import get_supabase
 from datetime import datetime
 import os
 
@@ -13,13 +13,25 @@ app.secret_key = "1234"
 # ---------------- INDEX ----------------
 @app.route("/")
 def index():
-    return render_template("index.html")
+    supabase = get_supabase()
+    transacoes = supabase.table("transacao").select("*").execute().data
+
+    total_entradas = sum(t["valor"] for t in transacoes if t["tipo"] == "entrada")
+    total_saidas   = sum(t["valor"] for t in transacoes if t["tipo"] == "saida")
+    saldo          = total_entradas - total_saidas
+
+    return render_template("index.html",
+        total_entradas=total_entradas,
+        total_saidas=total_saidas,
+        saldo=saldo
+    )
 
 
 # --------- CATEGORIAS ----------
 @app.route("/categorias", methods=["GET", "POST"])
 @app.route("/categorias/<int:id>", methods=["GET", "POST"])
 def categorias(id=None):
+    supabase = get_supabase()
 
     if request.method == "POST":
         nome = request.form.get("nome")
@@ -90,6 +102,7 @@ def categorias(id=None):
 @app.route("/pagamentos", methods=["GET", "POST"])
 @app.route("/pagamentos/<int:id>", methods=["GET", "POST"])
 def pagamentos(id=None):
+    supabase = get_supabase()
 
     if request.method == "POST":
         nome = request.form.get("nome")
@@ -157,6 +170,7 @@ def pagamentos(id=None):
 @app.route("/transacoes", methods=["GET", "POST"])
 @app.route("/transacoes/<int:id>", methods=["GET", "POST"])
 def transacoes(id=None):
+    supabase = get_supabase()
 
     if request.method == "POST":
         descricao = request.form.get("descricao", "").strip()
@@ -228,14 +242,15 @@ def transacoes(id=None):
         flash("Transação excluída com sucesso!", "success")
         return redirect(url_for("transacoes"))
 
-    transacoes_list = supabase.table("transacao").select("""
+    transacoes_list = get_supabase().table("transacao").select("""
         *,
         categoria: categoria_id (nome),
         forma: forma_pagamento_id (nome)
     """).order("id", desc=False).execute().data
 
-    categorias = supabase.table("categoria").select("*").execute().data
-    formas = supabase.table("forma_pagamento").select("*").execute().data
+    categorias = get_supabase().table("categoria").select("*").execute().data
+
+    formas = get_supabase().table("forma_pagamento").select("*").execute().data
 
     return render_template(
         "transacao.html",
