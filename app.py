@@ -45,6 +45,13 @@ def categorias(id=None):
         else:
             flash("Categoria não encontrada!", "danger")
             return redirect(url_for("categorias"))
+        
+    delete_id = request.args.get("delete_categoria")
+
+    if delete_id:
+        supabase.table("categoria").delete().eq("id", delete_id).execute()
+        flash("Categoria excluída com sucesso!", "success")
+        return redirect(url_for("categorias"))
 
     categorias = supabase.table("categoria").select("*").order("id", desc=False).execute().data
 
@@ -87,6 +94,14 @@ def pagamentos(id=None):
         else:
             flash("Forma de pagamento não encontrada!", "danger")
             return redirect(url_for("pagamentos"))
+        
+    delete_id = request.args.get("delete_pagamento")
+
+    if delete_id:
+        supabase.table("forma_pagamento").delete().eq("id", delete_id).execute()
+        flash("Forma de pagamento excluída com sucesso!", "success")
+        return redirect(url_for("pagamentos"))
+
         
     formas = supabase.table("forma_pagamento").select("*").order("id", desc=False).execute().data
     
@@ -144,6 +159,14 @@ def transacoes(id=None):
         else:
             flash("Transação não encontrada!", "danger")
             return redirect(url_for("transacoes"))
+        
+        
+    delete_id = request.args.get("delete_transacao")
+    
+    if delete_id:
+        supabase.table("transacao").delete().eq("id", delete_id).execute()
+        flash("Transação excluída com sucesso!", "success")
+        return redirect(url_for("transacoes"))
 
     transacoes_list = supabase.table("transacao").select("""
         *,

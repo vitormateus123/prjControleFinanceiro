@@ -132,7 +132,7 @@
         <td>{{ trans.categoria.nome }}</td>
         <td>{{ trans.forma.nome }}</td>
         <td><a href="{{ url_for('transacoes', id=trans.id) }}">✏️</a></td>
-        <td><a href="javascript:void(0)">🗑️</a></td>
+        <td><a href="{{ url_for('transacoes', delete_transacao=trans.id) }}" onclick="return confirm('Tem certeza?')">🗑️</a></td>
       </tr>
     {% endfor %}
   </tbody>

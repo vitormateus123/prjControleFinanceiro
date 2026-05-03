@@ -48,7 +48,7 @@
         <td>{{ cat.nome }}</td>
         <td>{{ cat.tipo }}</td>
         <td><a href="{{ url_for('categorias', id=cat.id) }}">✏️</a></td>
-        <td><a href="javascript:void(0)">🗑️</a></td>
+        <td><a href="{{ url_for('categorias', delete_categoria=cat.id) }}" onclick="return confirm('Tem certeza?')">🗑️</a></td>
       </tr>
     {% endfor %}
   </tbody>
