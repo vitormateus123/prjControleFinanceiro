@@ -2,18 +2,22 @@
 
 {% block content %}
 
+<div class="row g-4">
 
-    <div class="container container-form">
-      <div class="card p-4">
-        <div class="text-center mb-4">
-          <h3 class="fw-semibold">Nova Forma de Pagamento</h3>
-          <p class="text-muted mb-0">
-            Cadastre como você realiza seus pagamentos ou recebimentos.
-          </p>
-        </div>
+  <!-- FORMULÁRIO -->
+  <div class="col-lg-4">
+    <div class="card overflow-hidden">
 
+      <div class="card-form-header">
+        <h3><i class="bi bi-credit-card me-2"></i>Nova Forma de Pagamento</h3>
+        <p>Cadastre como você realiza seus <br> pagamentos ou recebimentos.</p>
+        <span class="header-icon">💳</span>
+      </div>
+
+      <div class="card-body-form">
         <form method="POST" action="{% if pagamento %}{{ url_for('pagamentos', id=pagamento.id) }}{% else %}{{ url_for('pagamentos') }}{% endif %}">
-          <div class="mb-3">
+
+          <div class="mb-4">
             <label class="form-label">Nome da forma</label>
             <input
               type="text"
@@ -21,38 +25,57 @@
               class="form-control"
               value="{{ pagamento.nome if pagamento else '' }}"
               placeholder="Ex: Cartão de crédito, Pix, Dinheiro"
-              required
-            />
+              required>
           </div>
 
           <div class="d-grid">
-            <button type="submit" class="btn btn-custom">Salvar</button>
+            <button type="submit" class="btn btn-custom">
+              <i class="bi bi-check2-circle me-2"></i>Salvar
+            </button>
           </div>
+
         </form>
       </div>
+
+    </div>
+  </div>
+
+  <!-- TABELA -->
+  <div class="col-lg-8">
+    <div class="section-title">
+      <span class="title-pill"></span>
+      Formas de pagamento cadastradas
     </div>
 
-<h4 class="mt-4 text-center fw-semibold">Formas de Pagamento cadastradas</h4>
+    <div class="table-wrapper">
+      <table class="table table-striped text-center">
+        <thead>
+          <tr>
+            <th class="text-center">Nome</th>
+            <th colspan="2">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pag in pagamentos %}
+            <tr>
+              <td class="text-center fw-500">{{ pag.nome }}</td>
+              <td>
+                <a class="table-action" href="{{ url_for('pagamentos', id=pag.id) }}" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              </td>
+              <td>
+                <a class="table-action delete" href="{{ url_for('pagamentos', delete_pagamento=pag.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-<table class="table table-striped mt-3 text-center">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nome</th>
-      <th>Editar</th>
-      <th>Excluir</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for pag in pagamentos %}
-      <tr>
-        <td>{{ pag.id }}</td>
-        <td>{{ pag.nome }}</td>
-        <td><a href="{{ url_for('pagamentos', id=pag.id) }}">✏️</a></td>
-        <td><a href="{{ url_for('pagamentos', delete_pagamento=pag.id) }}" onclick="return confirm('Tem certeza?')">🗑️</a></td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  </div>
+</div>
 
 {% endblock %}

@@ -6,48 +6,56 @@
     <title>Controle Financeiro</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
-<!-- NAVBAR FIXA -->
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
-    <a class="navbar-brand" href="/">💰 Controle Financeiro</a>
+    <a class="navbar-brand" href="/">
+      <span class="brand-icon">💰</span>
+      Controle Financeiro
+    </a>
 
-    <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+    <button class="navbar-toggler bg-light border-0" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse justify-content-end" id="menu">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/transacoes">Transações</a>
-        <a class="nav-link" href="/categorias">Categorias</a>
-        <a class="nav-link" href="/pagamentos">Pagamentos</a>
+      <div class="navbar-nav gap-1">
+        <a class="nav-link" href="/transacoes">
+          <i class="bi bi-arrow-left-right me-1"></i>Transações
+        </a>
+        <a class="nav-link" href="/categorias">
+          <i class="bi bi-tag me-1"></i>Categorias
+        </a>
+        <a class="nav-link" href="/pagamentos">
+          <i class="bi bi-credit-card me-1"></i>Pagamentos
+        </a>
       </div>
     </div>
   </div>
 </nav>
 
-<!-- 🔥 CONTEÚDO DAS PÁGINAS -->
-<div class="container mt-4">
+<!-- CONTEÚDO -->
+<div class="container py-4">
   {% block content %}{% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- TOAST GLOBAL -->
-<div class="toast-container position-fixed top-0 end-0 p-3">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
         <div class="toast align-items-center text-bg-{{ category }} border-0">
           <div class="d-flex">
-            <div class="toast-body">
-              {{ message }}
-            </div>
+            <div class="toast-body fw-500">{{ message }}</div>
             <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
           </div>
         </div>

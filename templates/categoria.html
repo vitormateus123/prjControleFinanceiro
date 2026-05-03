@@ -2,56 +2,90 @@
 
 {% block content %}
 
-<!-- FORMULÁRIO -->
-<div class="container container-form">
-    <form method="POST" action="{% if categoria %}{{ url_for('categorias', id=categoria.id) }}{% else %}{{ url_for('categorias') }}{% endif %}" class="card p-4">
+<div class="row g-4">
 
-      <div class="text-center">
-        <h3 class="mb-2 fw-semibold">Nova Categoria</h3>
-        <p class="text-muted">Informe de onde vem ou para onde vai seu dinheiro.</p>
+  <!-- FORMULÁRIO -->
+  <div class="col-lg-4">
+    <div class="card overflow-hidden">
+
+      <div class="card-form-header">
+        <h3><i class="bi bi-tag me-2"></i>Nova Categoria</h3>
+        <p>Informe de onde vem ou para onde vai seu dinheiro.</p>
+        <span class="header-icon">🏷️</span>
       </div>
 
-      <div class="mb-3">
-          <label class="form-label">Nome</label>
-          <input type="text" name="nome" value="{{ categoria.nome if categoria else '' }}" class="form-control" required>
+      <div class="card-body-form">
+        <form method="POST" action="{% if categoria %}{{ url_for('categorias', id=categoria.id) }}{% else %}{{ url_for('categorias') }}{% endif %}">
+
+          <div class="mb-3">
+            <label class="form-label">Nome</label>
+            <input type="text" name="nome" value="{{ categoria.nome if categoria else '' }}" class="form-control" placeholder="Ex: Alimentação, Salário..." required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Tipo</label>
+            <select name="tipo" class="form-select" required>
+              <option value="entrada" {% if categoria and categoria.tipo == "entrada" %}selected{% endif %}>📈 Entrada</option>
+              <option value="saida"   {% if categoria and categoria.tipo == "saida"   %}selected{% endif %}>📉 Saída</option>
+            </select>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-custom">
+              <i class="bi bi-check2-circle me-2"></i>Salvar Categoria
+            </button>
+          </div>
+
+        </form>
       </div>
 
-      <div class="mb-3">
-          <label class="form-label">Tipo</label>
-          <select name="tipo" class="form-select" required>
-              <option value="entrada" {% if categoria and categoria.tipo == "entrada" %}selected{% endif %}> Entrada </option>
-              <option value="saida" {% if categoria and categoria.tipo == "saida" %}selected{% endif %}> Saida </option>
-          </select>
-      </div>
+    </div>
+  </div>
 
-      <button type="submit" class="btn btn-custom w-100">Salvar</button>
+  <!-- TABELA -->
+  <div class="col-lg-8">
+    <div class="section-title">
+      <span class="title-pill"></span>
+      Categorias cadastradas
+    </div>
 
-    </form>
+    <div class="table-wrapper">
+      <table class="table table-striped text-center">
+        <thead>
+          <tr>
+            <th class="text-center">Nome</th>
+            <th>Tipo</th>
+            <th colspan="2">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in categorias %}
+            <tr>
+              <td class="text-center fw-500">{{ cat.nome }}</td>
+              <td>
+                {% if cat.tipo == "entrada" %}
+                  <span class="badge-entrada">Entrada</span>
+                {% else %}
+                  <span class="badge-saida">Saída</span>
+                {% endif %}
+              </td>
+              <td>
+                <a class="table-action" href="{{ url_for('categorias', id=cat.id) }}" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              </td>
+              <td>
+                <a class="table-action delete" href="{{ url_for('categorias', delete_categoria=cat.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </div>
-
-<h4 class="mt-4 text-center fw-semibold">Categorias cadastradas</h4>
-
-<table class="table table-striped mt-3 text-center">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nome</th>
-      <th>Tipo</th>
-      <th>Editar</th>
-      <th>Excluir</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for cat in categorias %}
-      <tr>
-        <td>{{ cat.id }}</td>
-        <td>{{ cat.nome }}</td>
-        <td>{{ cat.tipo }}</td>
-        <td><a href="{{ url_for('categorias', id=cat.id) }}">✏️</a></td>
-        <td><a href="{{ url_for('categorias', delete_categoria=cat.id) }}" onclick="return confirm('Tem certeza?')">🗑️</a></td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
 
 {% endblock %}
