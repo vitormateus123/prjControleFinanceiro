@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from services.supabase_client import supabase
 from datetime import datetime
+import os
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),  # ✅ caminho absoluto
+    static_folder=os.path.join(BASE_DIR, "static")        # ✅ caminho absoluto
+)
 app.secret_key = "1234"
 
 # ---------------- INDEX ----------------
