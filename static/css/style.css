@@ -461,3 +461,8 @@ a {
     font-size: 0.82rem;
   }
 }
+
+#campo-pagamento {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}

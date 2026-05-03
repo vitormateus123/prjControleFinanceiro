@@ -80,7 +80,7 @@
           </div>
 
           <!-- Forma de pagamento -->
-          <div class="mb-4">
+          <div class="mb-4" id="campo-pagamento">
             <label class="form-label">Forma de pagamento</label>
             <select name="forma_pagamento_id" class="form-select" required>
               <option value="" disabled selected>Selecione uma forma</option>
@@ -156,5 +156,27 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  const tipoCampo = document.querySelector('select[name="tipo"]')
+  const campoPagamento = document.getElementById('campo-pagamento')
+
+  function atualizarPagamento(animado = true) {
+    if (tipoCampo.value === 'saida') {
+      campoPagamento.style.display = 'block'
+      setTimeout(() => campoPagamento.style.opacity = '1', 10)
+    } else {
+      campoPagamento.style.opacity = '0'
+      if (animado) {
+        setTimeout(() => campoPagamento.style.display = 'none', 300)
+      } else {
+        campoPagamento.style.display = 'none'
+      }
+    }
+  }
+
+  tipoCampo.addEventListener('change', () => atualizarPagamento(true))
+  atualizarPagamento(false)  // sem animação no carregamento da página
+</script>
 
 {% endblock %}
