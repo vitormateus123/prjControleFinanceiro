@@ -4,7 +4,7 @@
 
 <!-- FORMULÁRIO -->
 <div class="container container-form">
-    <form method="POST" action="/categorias" class="card p-4">
+    <form method="POST" action="{% if categoria %}{{ url_for('categorias', id=categoria.id) }}{% else %}{{ url_for('categorias') }}{% endif %}" class="card p-4">
 
       <div class="text-center">
         <h3 class="mb-2 fw-semibold">Nova Categoria</h3>
@@ -13,14 +13,14 @@
 
       <div class="mb-3">
           <label class="form-label">Nome</label>
-          <input type="text" name="nome" class="form-control" required>
+          <input type="text" name="nome" value="{{ categoria.nome if categoria else '' }}" class="form-control" required>
       </div>
 
       <div class="mb-3">
           <label class="form-label">Tipo</label>
           <select name="tipo" class="form-select" required>
-              <option value="entrada">Entrada</option>
-              <option value="saida">Saída</option>
+              <option value="entrada" {% if categoria and categoria.tipo == "entrada" %}selected{% endif %}> Entrada </option>
+              <option value="saida" {% if categoria and categoria.tipo == "saida" %}selected{% endif %}> Saida </option>
           </select>
       </div>
 
@@ -28,5 +28,30 @@
 
     </form>
 </div>
+
+<h4 class="mt-4 text-center fw-semibold">Categorias cadastradas</h4>
+
+<table class="table table-striped mt-3 text-center">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Tipo</th>
+      <th>Editar</th>
+      <th>Excluir</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cat in categorias %}
+      <tr>
+        <td>{{ cat.id }}</td>
+        <td>{{ cat.nome }}</td>
+        <td>{{ cat.tipo }}</td>
+        <td><a href="{{ url_for('categorias', id=cat.id) }}">✏️</a></td>
+        <td><a href="javascript:void(0)">🗑️</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

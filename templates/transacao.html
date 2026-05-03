@@ -13,7 +13,7 @@
       </p>
     </div>
 
-    <form method="POST" action="{{ url_for('transacoes') }}">
+    <form method="POST" action="{% if transacao %}{{ url_for('transacoes', id=transacao.id) }}{% else %}{{ url_for('transacoes') }}{% endif %}">
 
       <!-- Descrição -->
       <div class="mb-3">
@@ -22,6 +22,7 @@
           type="text"
           name="descricao"
           class="form-control"
+          value="{{ transacao.descricao if transacao else '' }}"
           placeholder="Ex: Compra no mercado"
           required>
       </div>
@@ -33,6 +34,7 @@
           <input
             type="number"
             name="valor"
+            value="{{ transacao.valor if transacao else '' }}"
             class="form-control"
             step="0.01"
             min="0"
@@ -45,6 +47,7 @@
           <input
             type="date"
             name="data"
+            value="{{ transacao.data if transacao else '' }}"
             class="form-control"
             required>
         </div>
@@ -55,8 +58,8 @@
         <label class="form-label">Tipo</label>
         <select name="tipo" class="form-select" required>
           <option value="" disabled selected>Selecione o tipo</option>
-          <option value="entrada">Entrada</option>
-          <option value="saida">Saída</option>
+          <option value="entrada" {% if transacao and transacao.tipo == "entrada" %}selected{% endif %}> Entrada </option>
+          <option value="saida" {% if transacao and transacao.tipo == "saida" %}selected{% endif %}> Saída </option>
         </select>
       </div>
 
@@ -67,7 +70,10 @@
           <option value="" disabled selected>Selecione uma categoria</option>
 
           {% for cat in categorias %}
-            <option value="{{ cat.id }}">{{ cat.nome }}</option>
+            <option value="{{ cat.id }}"
+              {% if transacao and transacao.categoria_id == cat.id %}selected{% endif %}>
+              {{ cat.nome }}
+            </option>
           {% endfor %}
         </select>
       </div>
@@ -79,7 +85,10 @@
           <option value="" disabled selected>Selecione uma forma</option>
 
           {% for f in formas %}
-            <option value="{{ f.id }}">{{ f.nome }}</option>
+            <option value="{{ f.id }}"
+              {% if transacao and transacao.forma_pagamento_id == f.id %}selected{% endif %}>
+              {{ f.nome }}
+            </option>
           {% endfor %}
         </select>
       </div>
@@ -95,5 +104,38 @@
 
   </div>
 </div>
+
+<h4 class="mt-4 text-center fw-semibold">Transações cadastradas</h4>
+
+<table class="table table-striped mt-3 text-center">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Descrição</th>
+      <th>Valor</th>
+      <th>Data</th>
+      <th>Tipo</th>
+      <th>Categoria</th>
+      <th>Forma de Pagamento</th>
+      <th>Editar</th>
+      <th>Excluir</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for trans in transacoes %}
+      <tr>
+        <td>{{ trans.id }}</td>
+        <td>{{ trans.descricao }}</td>
+        <td>{{ trans.valor}}</td>
+        <td>{{ trans.data }}</td>
+        <td>{{ trans.tipo }}</td>
+        <td>{{ trans.categoria.nome }}</td>
+        <td>{{ trans.forma.nome }}</td>
+        <td><a href="{{ url_for('transacoes', id=trans.id) }}">✏️</a></td>
+        <td><a href="javascript:void(0)">🗑️</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

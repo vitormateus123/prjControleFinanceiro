@@ -8,47 +8,98 @@ app.secret_key = "1234"
 def index():
     return render_template("index.html")
 
+# --------- Categoria ---------- 
 @app.route("/categorias", methods=["GET", "POST"])
-def categorias():
+@app.route("/categorias/<int:id>", methods=["GET", "POST"])
+def categorias(id=None):
+
     if request.method == "POST":
         nome = request.form.get("nome")
         tipo = request.form.get("tipo")
 
-        supabase.table("categoria").insert({
-            "nome": nome,
-            "tipo": tipo
-        }).execute()
-        
-        flash("Categoria criada com sucesso!", "success")
-        
+        if id:
+            supabase.table("categoria").update({
+                "nome": nome,
+                "tipo": tipo
+            }).eq("id", id).execute()
+
+            flash("Categoria atualizada com sucesso!", "success")
+
+        else:
+            supabase.table("categoria").insert({
+                "nome": nome,
+                "tipo": tipo
+            }).execute()
+
+            flash("Categoria criada com sucesso!", "success")
+
         return redirect(url_for("categorias"))
 
-    res = supabase.table("categoria").select("*").execute()
-    categorias = res.data
+    categoria = None
 
-    return render_template("categoria.html", categorias=categorias)
+    if id:
+        res = supabase.table("categoria").select("*").eq("id", id).execute()
 
+        if res.data:
+            categoria = res.data[0]
+        else:
+            flash("Categoria não encontrada!", "danger")
+            return redirect(url_for("categorias"))
+
+    categorias = supabase.table("categoria").select("*").order("id", desc=False).execute().data
+
+    return render_template(
+        "categoria.html",
+        categorias=categorias,
+        categoria=categoria
+    )
+
+# -------- Pagamentos ---------
 @app.route("/pagamentos", methods=["GET", "POST"])
-def pagamentos():
+@app.route("/pagamentos/<int:id>", methods=["GET", "POST"])
+
+def pagamentos(id=None):
     if request.method == "POST":
         nome = request.form.get("nome")
         
-        supabase.table("forma_pagamento").insert({
-            "nome": nome
-        }).execute()
-        
-        flash("Pagamento criado com sucesso!", "success")
+        if id:
+            supabase.table("forma_pagamento").update({
+                "nome": nome
+            }).eq("id", id).execute()
+            
+            flash("Pagamento atualizado com sucesso!", "success")
+        else:
+            supabase.table("forma_pagamento").insert({
+                "nome": nome
+            }).execute()
+            
+            flash("Pagamento criado com sucesso!", "success")
 
-        
         return redirect(url_for("pagamentos"))
-        
-    res = supabase.table("forma_pagamento").select("*").execute()
-    pagamentos = res.data
     
-    return render_template("pagamento.html", pagamentos=pagamentos)
+    pagamento = None
+    
+    if id:   
+        res = supabase.table("forma_pagamento").select("*").eq("id", id).execute()
 
+        if res.data:
+            pagamento = res.data[0]
+        else:
+            flash("Forma de pagamento não encontrada!", "danger")
+            return redirect(url_for("pagamentos"))
+        
+    formas = supabase.table("forma_pagamento").select("*").order("id", desc=False).execute().data
+    
+    return render_template(
+        "pagamento.html",
+        pagamentos=formas,
+        pagamento=pagamento
+    )
+# --------- Transações ----------
 @app.route("/transacoes", methods=["GET", "POST"])
-def transacoes():
+@app.route("/transacoes/<int:id>", methods=["GET", "POST"])
+def transacoes(id=None):
+
     if request.method == "POST":
         descricao = request.form.get("descricao")
         valor = float(request.form.get("valor"))
@@ -57,27 +108,58 @@ def transacoes():
         categoria_id = int(request.form.get("categoria_id"))
         forma_pagamento_id = int(request.form.get("forma_pagamento_id"))
 
-        supabase.table("transacao").insert({
-            "descricao": descricao,
-            "valor": valor,
-            "data": data,
-            "tipo": tipo,
-            "categoria_id": categoria_id,
-            "forma_pagamento_id": forma_pagamento_id
-        }).execute()
+        if id:
+            supabase.table("transacao").update({
+                "descricao": descricao,
+                "valor": valor,
+                "data": data,
+                "tipo": tipo,
+                "categoria_id": categoria_id,
+                "forma_pagamento_id": forma_pagamento_id
+            }).eq("id", id).execute()
 
-        flash("Transação cadastrada com sucesso!", "success")
+            flash("Transação atualizada com sucesso!", "success")
+        else:
+            supabase.table("transacao").insert({
+                "descricao": descricao,
+                "valor": valor,
+                "data": data,
+                "tipo": tipo,
+                "categoria_id": categoria_id,
+                "forma_pagamento_id": forma_pagamento_id
+            }).execute()
+
+            flash("Transação cadastrada com sucesso!", "success")
+
         return redirect(url_for("transacoes"))
 
-    transacoes = supabase.table("transacao").select("*").execute().data
+    # ---------------- GET ----------------
+    transacao = None
+
+    if id:
+        res = supabase.table("transacao").select("*").eq("id", id).execute()
+
+        if res.data:
+            transacao = res.data[0]
+        else:
+            flash("Transação não encontrada!", "danger")
+            return redirect(url_for("transacoes"))
+
+    transacoes_list = supabase.table("transacao").select("""
+        *,
+        categoria: categoria_id (nome),
+        forma: forma_pagamento_id (nome)
+    """).order("id", desc=False).execute().data
+
     categorias = supabase.table("categoria").select("*").execute().data
     formas = supabase.table("forma_pagamento").select("*").execute().data
 
     return render_template(
         "transacao.html",
-        transacoes=transacoes,
+        transacoes=transacoes_list,
         categorias=categorias,
-        formas=formas
+        formas=formas,
+        transacao=transacao
     )
     
 if __name__ == "__main__":

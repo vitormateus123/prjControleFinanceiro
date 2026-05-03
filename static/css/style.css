@@ -164,3 +164,8 @@ body {
 .rounded-10 {
     border-radius: 10px;
 }
+
+a {
+  color: inherit; /* Remove o azul e adota a cor do texto pai */
+  text-decoration: none; /* Remove o sublinhado */
+}

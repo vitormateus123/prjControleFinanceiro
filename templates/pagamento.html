@@ -12,13 +12,14 @@
           </p>
         </div>
 
-        <form method="POST" action="/pagamentos">
+        <form method="POST" action="{% if pagamento %}{{ url_for('pagamentos', id=pagamento.id) }}{% else %}{{ url_for('pagamentos') }}{% endif %}">
           <div class="mb-3">
             <label class="form-label">Nome da forma</label>
             <input
               type="text"
               name="nome"
               class="form-control"
+              value="{{ pagamento.nome if pagamento else '' }}"
               placeholder="Ex: Cartão de crédito, Pix, Dinheiro"
               required
             />
@@ -31,5 +32,27 @@
       </div>
     </div>
 
+<h4 class="mt-4 text-center fw-semibold">Formas de Pagamento cadastradas</h4>
+
+<table class="table table-striped mt-3 text-center">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nome</th>
+      <th>Editar</th>
+      <th>Excluir</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pag in pagamentos %}
+      <tr>
+        <td>{{ pag.id }}</td>
+        <td>{{ pag.nome }}</td>
+        <td><a href="{{ url_for('pagamentos', id=pag.id) }}">✏️</a></td>
+        <td><a href="javascript:void(0)">🗑️</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
