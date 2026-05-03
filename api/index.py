@@ -1,10 +1,11 @@
 import sys
 import os
 
-# Adiciona a raiz do projeto ao path para que os imports funcionem
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Garante que a raiz do projeto esteja no path
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, root)
 
 from app import app
 
-# Handler para a Vercel (WSGI)
+# Handler WSGI para a Vercel
 handler = app
