@@ -82,7 +82,7 @@
           <!-- Forma de pagamento -->
           <div class="mb-4" id="campo-pagamento">
             <label class="form-label">Forma de pagamento</label>
-            <select name="forma_pagamento_id" class="form-select" required>
+            <select name="forma_pagamento_id" class="form-select">
               <option value="" disabled selected>Selecione uma forma</option>
               {% for f in formas %}
                 <option value="{{ f.id }}"
@@ -140,7 +140,7 @@
             {% endif %}
           </td>
           <td>{{ trans.categoria.nome }}</td>
-          <td>{{ trans.forma.nome }}</td>
+          <td>{{ trans.forma.nome if trans.forma else '-' }}</td>
           <td>
             <a class="table-action" href="{{ url_for('transacoes', id=trans.id) }}" title="Editar">
               <i class="bi bi-pencil"></i>
@@ -160,12 +160,15 @@
 <script>
   const tipoCampo = document.querySelector('select[name="tipo"]')
   const campoPagamento = document.getElementById('campo-pagamento')
+  const selectPagamento = campoPagamento.querySelector('select')
 
   function atualizarPagamento(animado = true) {
     if (tipoCampo.value === 'saida') {
       campoPagamento.style.display = 'block'
+      selectPagamento.required = true
       setTimeout(() => campoPagamento.style.opacity = '1', 10)
     } else {
+      selectPagamento.required = false
       campoPagamento.style.opacity = '0'
       if (animado) {
         setTimeout(() => campoPagamento.style.display = 'none', 300)
@@ -176,7 +179,7 @@
   }
 
   tipoCampo.addEventListener('change', () => atualizarPagamento(true))
-  atualizarPagamento(false)  // sem animação no carregamento da página
+  atualizarPagamento(false)
 </script>
 
 {% endblock %}
