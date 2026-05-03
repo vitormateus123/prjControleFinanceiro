@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container container-form">
+  <div class="card p-4">
+
+    <!-- Cabeçalho -->
+    <div class="text-center mb-4">
+      <h3 class="fw-semibold">Nova Transação</h3>
+      <p class="text-muted mb-0">
+        Registre uma entrada ou saída do seu dinheiro.
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('transacoes') }}">
+
+      <!-- Descrição -->
+      <div class="mb-3">
+        <label class="form-label">Descrição</label>
+        <input
+          type="text"
+          name="descricao"
+          class="form-control"
+          placeholder="Ex: Compra no mercado"
+          required>
+      </div>
+
+      <!-- Valor + Data (lado a lado) -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Valor (R$)</label>
+          <input
+            type="number"
+            name="valor"
+            class="form-control"
+            step="0.01"
+            min="0"
+            placeholder="0,00"
+            required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Data</label>
+          <input
+            type="date"
+            name="data"
+            class="form-control"
+            required>
+        </div>
+      </div>
+
+      <!-- Tipo -->
+      <div class="mb-3">
+        <label class="form-label">Tipo</label>
+        <select name="tipo" class="form-select" required>
+          <option value="" disabled selected>Selecione o tipo</option>
+          <option value="entrada">Entrada</option>
+          <option value="saida">Saída</option>
+        </select>
+      </div>
+
+      <!-- Categoria -->
+      <div class="mb-3">
+        <label class="form-label">Categoria</label>
+        <select name="categoria_id" class="form-select" required>
+          <option value="" disabled selected>Selecione uma categoria</option>
+
+          {% for cat in categorias %}
+            <option value="{{ cat.id }}">{{ cat.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Forma de pagamento -->
+      <div class="mb-4">
+        <label class="form-label">Forma de pagamento</label>
+        <select name="forma_pagamento_id" class="form-select" required>
+          <option value="" disabled selected>Selecione uma forma</option>
+
+          {% for f in formas %}
+            <option value="{{ f.id }}">{{ f.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Botão -->
+      <div class="d-grid">
+        <button type="submit" class="btn btn-custom">
+          Salvar Transação
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

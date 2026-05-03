@@ -1,0 +1,166 @@
+/* =========================
+   VARIÁVEIS (PADRÃO DO SISTEMA)
+========================= */
+:root {
+    --azul-principal: #0d3b66;
+    --azul-secundario: #00a8e8;
+    --azul-hover: #0077b6;
+    --cinza-fundo: #f5f7fa;
+    --cinza-texto: #6c757d;
+    --branco: #ffffff;
+}
+
+/* =========================
+   RESET E BASE
+========================= */
+body {
+    background-color: var(--cinza-fundo);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+    background-color: var(--azul-principal);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    color: var(--branco) !important;
+    font-weight: 600;
+}
+
+.nav-link {
+    color: var(--branco) !important;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--azul-secundario) !important;
+}
+
+/* =========================
+   CONTAINERS
+========================= */
+.container-form {
+    max-width: 500px;
+    margin-top: 60px;
+}
+
+.container-page {
+    margin-top: 40px;
+}
+
+/* =========================
+   CARDS
+========================= */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+/* =========================
+   BOTÕES
+========================= */
+.btn-custom {
+    background-color: var(--azul-secundario);
+    color: var(--branco);
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-custom:hover {
+    background-color: var(--azul-hover);
+    color: var(--branco);
+}
+
+/* =========================
+   FORMULÁRIOS
+========================= */
+.form-label {
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--azul-secundario);
+    box-shadow: 0 0 0 0.2rem rgba(0,168,232,0.2);
+}
+
+/* =========================
+   TEXTOS
+========================= */
+.text-muted {
+    color: var(--cinza-texto) !important;
+}
+
+/* =========================
+   HERO (PÁGINA INICIAL)
+========================= */
+.hero {
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-secundario));
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-weight: 600;
+}
+
+.hero p {
+    opacity: 0.9;
+}
+
+/* =========================
+   CARDS DA HOME
+========================= */
+.card-home {
+    transition: 0.3s;
+    text-align: center;
+    padding: 20px;
+}
+
+.card-home:hover {
+    transform: translateY(-5px);
+}
+
+/* =========================
+   TABELAS (futuro - transações)
+========================= */
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: var(--azul-principal);
+    color: white;
+}
+
+/* =========================
+   UTILIDADES
+========================= */
+.shadow-soft {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.rounded-10 {
+    border-radius: 10px;
+}

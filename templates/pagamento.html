@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+    <div class="container container-form">
+      <div class="card p-4">
+        <div class="text-center mb-4">
+          <h3 class="fw-semibold">Nova Forma de Pagamento</h3>
+          <p class="text-muted mb-0">
+            Cadastre como você realiza seus pagamentos ou recebimentos.
+          </p>
+        </div>
+
+        <form method="POST" action="/pagamentos">
+          <div class="mb-3">
+            <label class="form-label">Nome da forma</label>
+            <input
+              type="text"
+              name="nome"
+              class="form-control"
+              placeholder="Ex: Cartão de crédito, Pix, Dinheiro"
+              required
+            />
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-custom">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+{% endblock %}
