@@ -159,7 +159,8 @@ def transacoes(id=None):
         data = request.form.get("data")
         tipo = request.form.get("tipo")
         categoria_id = request.form.get("categoria_id")
-        forma_pagamento_id = request.form.get("forma_pagamento_id")
+        forma_pagamento_id = request.form.get("forma_pagamento_id") 
+        forma_origem_id = request.form.get("forma_origem_id") 
 
         if not descricao or not valor_raw or not data or not tipo:
             flash("Preencha todos os campos!", "danger")
@@ -184,7 +185,8 @@ def transacoes(id=None):
             "data": data,
             "tipo": tipo,
             "categoria_id": categoria_id,
-            "forma_pagamento_id": forma_pagamento_id
+            "forma_pagamento_id": forma_pagamento_id if tipo == "saida" else None,
+            "forma_origem_id": int(forma_origem_id) if forma_origem_id and tipo == "entrada" else None
         }
 
         if id:
@@ -214,7 +216,8 @@ def transacoes(id=None):
     transacoes_list = get_supabase().table("transacao").select("""
         *,
         categoria: categoria_id (nome),
-        forma: forma_pagamento_id (nome)
+        forma: forma_pagamento_id (nome),
+        origem: forma_origem_id (nome)
     """).order("id", desc=False).execute().data
 
     categorias = get_supabase().table("categoria").select("*").execute().data

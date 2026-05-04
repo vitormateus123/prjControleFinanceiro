@@ -14,18 +14,14 @@
       </div>
 
       <div class="card-body-form">
-        <form method="POST" action="{% if transacao %}{{ url_for('transacoes', id=transacao.id) }}{% else %}{{ url_for('transacoes') }}{% endif %}">
+        <form method="POST"
+          action="{% if transacao %}{{ url_for('transacoes', id=transacao.id) }}{% else %}{{ url_for('transacoes') }}{% endif %}">
 
           <!-- Descrição -->
           <div class="mb-3">
             <label class="form-label">Descrição</label>
-            <input
-              type="text"
-              name="descricao"
-              class="form-control"
-              value="{{ transacao.descricao if transacao else '' }}"
-              placeholder="Ex: Compra no mercado"
-              required>
+            <input type="text" name="descricao" class="form-control"
+              value="{{ transacao.descricao if transacao else '' }}" placeholder="Ex: Compra no mercado" required>
           </div>
 
           <!-- Valor + Data -->
@@ -34,23 +30,13 @@
               <label class="form-label">Valor (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input
-                  type="number"
-                  name="valor"
-                  value="{{ transacao.valor if transacao else '' }}"
-                  class="form-control"
-                  step="0.01" min="0"
-                  placeholder="0,00"
-                  required>
+                <input type="number" name="valor" value="{{ transacao.valor if transacao else '' }}"
+                  class="form-control" step="0.01" min="0" placeholder="0,00" required>
               </div>
             </div>
             <div class="col-6">
               <label class="form-label">Data</label>
-              <input
-                type="date"
-                name="data"
-                value="{{ transacao.data if transacao else '' }}"
-                class="form-control"
+              <input type="date" name="data" value="{{ transacao.data if transacao else '' }}" class="form-control"
                 required>
             </div>
           </div>
@@ -60,8 +46,9 @@
             <label class="form-label">Tipo</label>
             <select name="tipo" class="form-select" required>
               <option value="" disabled selected>Selecione o tipo</option>
-              <option value="entrada" {% if transacao and transacao.tipo == "entrada" %}selected{% endif %}>📈 Entrada</option>
-              <option value="saida"   {% if transacao and transacao.tipo == "saida"   %}selected{% endif %}>📉 Saída</option>
+              <option value="entrada" {% if transacao and transacao.tipo=="entrada" %}selected{% endif %}>📈 Entrada
+              </option>
+              <option value="saida" {% if transacao and transacao.tipo=="saida" %}selected{% endif %}>📉 Saída</option>
             </select>
           </div>
 
@@ -71,24 +58,35 @@
             <select name="categoria_id" class="form-select" required>
               <option value="" disabled selected>Selecione uma categoria</option>
               {% for cat in categorias %}
-                <option value="{{ cat.id }}"
-                  {% if transacao and transacao.categoria_id == cat.id %}selected{% endif %}>
-                  {{ cat.nome }}
-                </option>
+              <option value="{{ cat.id }}" {% if transacao and transacao.categoria_id==cat.id %}selected{% endif %}>
+                {{ cat.nome }}
+              </option>
               {% endfor %}
             </select>
           </div>
 
-          <!-- Forma de pagamento -->
-          <div class="mb-4" id="campo-pagamento">
+          <!-- Forma de pagamento (saída) -->
+          <div class="mb-4" id="campo-pagamento" style="display:none; opacity:0;">
             <label class="form-label">Forma de pagamento</label>
             <select name="forma_pagamento_id" class="form-select">
-              <option value="" disabled selected>Selecione uma forma</option>
+              <option value="">Nenhuma</option>
               {% for f in formas %}
-                <option value="{{ f.id }}"
-                  {% if transacao and transacao.forma_pagamento_id == f.id %}selected{% endif %}>
-                  {{ f.nome }}
-                </option>
+              <option value="{{ f.id }}" {% if transacao and transacao.forma_pagamento_id==f.id %}selected{% endif %}>
+                {{ f.nome }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Forma de origem (entrada) -->
+          <div class="mb-4" id="campo-origem" style="display:none; opacity:0;">
+            <label class="form-label">Origem do dinheiro <span class="text-muted">(opcional)</span></label>
+            <select name="forma_origem_id" class="form-select">
+              <option value="">Não informar</option>
+              {% for f in formas %}
+              <option value="{{ f.id }}" {% if transacao and transacao.forma_origem_id==f.id %}selected{% endif %}>
+                {{ f.nome }}
+              </option>
               {% endfor %}
             </select>
           </div>
@@ -122,64 +120,77 @@
         <th>Tipo</th>
         <th>Categoria</th>
         <th>Pagamento</th>
+        <th>Origem</th>
         <th>Editar</th>
         <th>Excluir</th>
       </tr>
     </thead>
     <tbody>
       {% for trans in transacoes %}
-        <tr>
-          <td class="text-center">{{ trans.descricao }}</td>
-          <td style="white-space:nowrap;"><strong>R$ {{ "%.2f"|format(trans.valor|float) }}</strong></td>
-          <td style="white-space:nowrap;">{{ trans.data | data_br }}</td>
-          <td>
-            {% if trans.tipo == "entrada" %}
-              <span class="badge-entrada">Entrada</span>
-            {% else %}
-              <span class="badge-saida">Saída</span>
-            {% endif %}
-          </td>
-          <td>{{ trans.categoria.nome }}</td>
-          <td>{{ trans.forma.nome if trans.forma else '-' }}</td>
-          <td>
-            <a class="table-action" href="{{ url_for('transacoes', id=trans.id) }}" title="Editar">
-              <i class="bi bi-pencil"></i>
-            </a>
-          </td>
-          <td>
-            <a class="table-action delete" href="{{ url_for('transacoes', delete_transacao=trans.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
-              <i class="bi bi-trash"></i>
-            </a>
-          </td>
-        </tr>
+      <tr>
+        <td class="text-center">{{ trans.descricao }}</td>
+        <td style="white-space:nowrap;"><strong>R$ {{ "%.2f"|format(trans.valor|float) }}</strong></td>
+        <td style="white-space:nowrap;">{{ trans.data | data_br }}</td>
+        <td>
+          {% if trans.tipo == "entrada" %}
+          <span class="badge-entrada">Entrada</span>
+          {% else %}
+          <span class="badge-saida">Saída</span>
+          {% endif %}
+        </td>
+        <td>{{ trans.categoria.nome }}</td>
+        <td>{{ trans.forma.nome if trans.forma else '-' }}</td>
+        <td>{{ trans.origem.nome if trans.origem else '-' }}</td>
+        <td>
+          <a class="table-action" href="{{ url_for('transacoes', id=trans.id) }}" title="Editar">
+            <i class="bi bi-pencil"></i>
+          </a>
+        </td>
+        <td>
+          <a class="table-action delete" href="{{ url_for('transacoes', delete_transacao=trans.id) }}"
+            onclick="return confirm('Tem certeza?')" title="Excluir">
+            <i class="bi bi-trash"></i>
+          </a>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
 <script>
-  const tipoCampo = document.querySelector('select[name="tipo"]')
-  const campoPagamento = document.getElementById('campo-pagamento')
-  const selectPagamento = campoPagamento.querySelector('select')
+  const tipoCampo       = document.querySelector('select[name="tipo"]')
+  const campoPagamento  = document.getElementById('campo-pagamento')
+  const campoOrigem     = document.getElementById('campo-origem')
 
-  function atualizarPagamento(animado = true) {
-    if (tipoCampo.value === 'saida') {
-      campoPagamento.style.display = 'block'
-      selectPagamento.required = true
-      setTimeout(() => campoPagamento.style.opacity = '1', 10)
+  function atualizarCampos(animado = true) {
+    const isSaida   = tipoCampo.value === 'saida'
+    const isEntrada = tipoCampo.value === 'entrada'
+
+    // Pagamento: só aparece em saída
+    campoPagamento.querySelector('select').required = isSaida
+    alternarCampo(campoPagamento, isSaida, animado)
+
+    // Origem: só aparece em entrada
+    alternarCampo(campoOrigem, isEntrada, animado)
+  }
+
+  function alternarCampo(el, mostrar, animado) {
+    if (mostrar) {
+      el.style.display = 'block'
+      setTimeout(() => el.style.opacity = '1', 10)
     } else {
-      selectPagamento.required = false
-      campoPagamento.style.opacity = '0'
+      el.style.opacity = '0'
       if (animado) {
-        setTimeout(() => campoPagamento.style.display = 'none', 300)
+        setTimeout(() => el.style.display = 'none', 300)
       } else {
-        campoPagamento.style.display = 'none'
+        el.style.display = 'none'
       }
     }
   }
 
-  tipoCampo.addEventListener('change', () => atualizarPagamento(true))
-  atualizarPagamento(false)
+  tipoCampo.addEventListener('change', () => atualizarCampos(true))
+  atualizarCampos(false)
 </script>
 
 {% endblock %}
