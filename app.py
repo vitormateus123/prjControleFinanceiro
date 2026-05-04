@@ -10,7 +10,7 @@ app = Flask(__name__,
     template_folder=os.path.join(BASE_DIR, "templates"),
     static_folder=os.path.join(BASE_DIR, "static")
 )
-app.secret_key = os.environ.get("SECRET_KEY", "12345")
+app.secret_key = os.environ.get("SECRET_KEY")
 
 # ---------------- LOGIN ----------------
 def login_required(f):
