@@ -41,16 +41,28 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-    transacoes = get_supabase().table("transacao").select("*").execute().data
+    sb = get_supabase()
+    transacoes = sb.table("transacao").select("""
+        *, categoria: categoria_id (nome), forma: forma_pagamento_id (nome)
+    """).order("data", desc=True).execute().data
 
     total_entradas = sum(t["valor"] for t in transacoes if t["tipo"] == "entrada")
     total_saidas   = sum(t["valor"] for t in transacoes if t["tipo"] == "saida")
     saldo          = total_entradas - total_saidas
 
+    ultimas = transacoes[:5]
+
+    porc_entradas = round((total_entradas / (total_entradas + total_saidas) * 100)) if (total_entradas + total_saidas) > 0 else 0
+    porc_saidas   = 100 - porc_entradas
+
     return render_template("index.html",
         total_entradas=total_entradas,
         total_saidas=total_saidas,
-        saldo=saldo
+        saldo=saldo,
+        ultimas=ultimas,
+        porc_entradas=porc_entradas,
+        porc_saidas=porc_saidas,
+        total_transacoes=len(transacoes)
     )
 
 # --------- CATEGORIAS ----------
