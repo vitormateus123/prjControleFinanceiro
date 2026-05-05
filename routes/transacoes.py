@@ -11,7 +11,7 @@ def transacoes(id=None):
     sb = get_supabase()
 
     if request.method == "POST":
-        descricao          = request.form.get("descricao", "").strip().capitalize()
+        descricao          = request.form.get("descricao", "").strip()
         valor_raw          = request.form.get("valor")
         data               = request.form.get("data")
         tipo               = request.form.get("tipo")
@@ -23,6 +23,9 @@ def transacoes(id=None):
         if not valor_raw or not data or not tipo:
             flash("Preencha todos os campos!", "danger")
             return redirect(url_for("transacoes.transacoes"))
+
+        if descricao[0].isLower():
+            descricao[0].Upper() + descricao[1:]
 
         if tipo == "transferencia" and (not forma_origem_id or not forma_destino_id):
             flash("Informe a origem e o destino da transferência!", "danger")

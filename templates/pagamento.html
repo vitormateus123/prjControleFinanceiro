@@ -48,10 +48,10 @@
     </div>
 
     <div class="table-wrapper">
-      <table class="table table-striped text-center">
+      <table id="tabela-pagamentos" class="table table-striped text-center">
         <thead>
           <tr>
-            <th class="text-center">Nome</th>
+            <th class="text-center sortable" data-col="0">Nome <i class="bi bi-chevron-expand sort-icon"></i></th>
             <th colspan="2">Ações</th>
           </tr>
         </thead>
@@ -77,5 +77,42 @@
 
   </div>
 </div>
+
+<script>
+  const tabela  = document.getElementById('tabela-pagamentos')
+  const tbody   = tabela.querySelector('tbody')
+  let ultimaCol = -1
+  let ordemAsc  = true
+
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = parseInt(th.dataset.col)
+
+      if (ultimaCol === col) {
+        ordemAsc = !ordemAsc
+      } else {
+        ordemAsc  = true
+        ultimaCol = col
+      }
+
+      document.querySelectorAll('th.sortable .sort-icon').forEach(i => {
+        i.className = 'bi bi-chevron-expand sort-icon'
+      })
+      th.querySelector('.sort-icon').className = ordemAsc
+        ? 'bi bi-chevron-up sort-icon'
+        : 'bi bi-chevron-down sort-icon'
+
+      const linhas = Array.from(tbody.querySelectorAll('tr'))
+      linhas.sort((a, b) => {
+        const textoA = a.cells[col]?.innerText.trim().toLowerCase() || ''
+        const textoB = b.cells[col]?.innerText.trim().toLowerCase() || ''
+        return ordemAsc
+          ? textoA.localeCompare(textoB, 'pt-BR')
+          : textoB.localeCompare(textoA, 'pt-BR')
+      })
+      linhas.forEach(linha => tbody.appendChild(linha))
+    })
+  })
+</script>
 
 {% endblock %}
