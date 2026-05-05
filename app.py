@@ -72,8 +72,7 @@ def categorias(id=None):
         nome = request.form.get("nome")
         tipo = request.form.get("tipo")
 
-        if nome[0].isLower():
-            nome[0].Upper() + nome[1:]
+        nome = nome[0].upper() + nome[1:] if nome else nome
 
 
         if id:
@@ -117,8 +116,7 @@ def pagamentos(id=None):
     if request.method == "POST":
         nome = request.form.get("nome")
 
-        if nome[0].isLower():
-            nome[0].Upper() + nome[1:]
+        nome = nome[0].upper() + nome[1:] if nome else nome
 
 
         if id:

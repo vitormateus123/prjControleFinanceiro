@@ -24,9 +24,8 @@ def transacoes(id=None):
             flash("Preencha todos os campos!", "danger")
             return redirect(url_for("transacoes.transacoes"))
 
-        if descricao[0].isLower():
-            descricao[0].Upper() + descricao[1:]
-
+        descricao = descricao[0].upper() + descricao[1:] if descricao else descricao
+        
         if tipo == "transferencia" and (not forma_origem_id or not forma_destino_id):
             flash("Informe a origem e o destino da transferência!", "danger")
             return redirect(url_for("transacoes.transacoes"))
