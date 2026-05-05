@@ -11,7 +11,7 @@ def transacoes(id=None):
     sb = get_supabase()
 
     if request.method == "POST":
-        descricao          = request.form.get("descricao", "").strip()
+        descricao          = request.form.get("descricao", "").strip().capitalize()
         valor_raw          = request.form.get("valor")
         data               = request.form.get("data")
         tipo               = request.form.get("tipo")

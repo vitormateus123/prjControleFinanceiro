@@ -69,7 +69,7 @@ def categorias(id=None):
     sb = get_supabase()
 
     if request.method == "POST":
-        nome = request.form.get("nome")
+        nome = request.form.get("nome").capitalize()
         tipo = request.form.get("tipo")
 
         if id:
@@ -111,7 +111,8 @@ def pagamentos(id=None):
     sb = get_supabase()
 
     if request.method == "POST":
-        nome = request.form.get("nome")
+        nome = request.form.get("nome").capitalize()
+        
         if id:
             sb.table("forma_pagamento").update({"nome": nome}).eq("id", id).execute()
             flash("Pagamento atualizado com sucesso!", "success")
