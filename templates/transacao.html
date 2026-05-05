@@ -14,14 +14,18 @@
       </div>
 
       <div class="card-body-form">
-        <form method="POST"
-          action="{% if transacao %}{{ url_for('transacoes.transacoes', id=transacao.id) }}{% else %}{{ url_for('transacoes.transacoes') }}{% endif %}">
+        <form method="POST" action="{% if transacao %}{{ url_for('transacoes.transacoes', id=transacao.id) }}{% else %}{{ url_for('transacoes.transacoes') }}{% endif %}">
 
           <!-- Descrição -->
           <div class="mb-3">
             <label class="form-label">Descrição</label>
-            <input type="text" name="descricao" class="form-control"
-              value="{{ transacao.descricao if transacao else '' }}" placeholder="Ex: Compra no mercado" required>
+            <input
+              type="text"
+              name="descricao"
+              class="form-control"
+              value="{{ transacao.descricao if transacao else '' }}"
+              placeholder="Ex: Compra no mercado"
+              required>
           </div>
 
           <!-- Valor + Data -->
@@ -30,13 +34,23 @@
               <label class="form-label">Valor (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input type="number" name="valor" value="{{ transacao.valor if transacao else '' }}"
-                  class="form-control" step="0.01" min="0" placeholder="0,00" required>
+                <input
+                  type="number"
+                  name="valor"
+                  value="{{ transacao.valor if transacao else '' }}"
+                  class="form-control"
+                  step="0.01" min="0"
+                  placeholder="0,00"
+                  required>
               </div>
             </div>
             <div class="col-6">
               <label class="form-label">Data</label>
-              <input type="date" name="data" value="{{ transacao.data if transacao else '' }}" class="form-control"
+              <input
+                type="date"
+                name="data"
+                value="{{ transacao.data if transacao else '' }}"
+                class="form-control"
                 required>
             </div>
           </div>
@@ -46,11 +60,9 @@
             <label class="form-label">Tipo</label>
             <select name="tipo" class="form-select" required>
               <option value="" disabled selected>Selecione o tipo</option>
-              <option value="entrada" {% if transacao and transacao.tipo=="entrada" %}selected{% endif %}>📈 Entrada
-              </option>
-              <option value="saida" {% if transacao and transacao.tipo=="saida" %}selected{% endif %}>📉 Saída</option>
-              <option value="transferencia" {% if transacao and transacao.tipo=="transferencia" %}selected{% endif %}>🔄
-                Transferência</option>
+              <option value="entrada"       {% if transacao and transacao.tipo == "entrada"       %}selected{% endif %}>📈 Entrada</option>
+              <option value="saida"         {% if transacao and transacao.tipo == "saida"         %}selected{% endif %}>📉 Saída</option>
+              <option value="transferencia" {% if transacao and transacao.tipo == "transferencia" %}selected{% endif %}>🔄 Transferência</option>
             </select>
           </div>
 
@@ -60,9 +72,11 @@
             <select name="categoria_id" class="form-select">
               <option value="" disabled selected>Selecione uma categoria</option>
               {% for cat in categorias %}
-              <option value="{{ cat.id }}" {% if transacao and transacao.categoria_id==cat.id %}selected{% endif %}>
-                {{ cat.nome }}
-              </option>
+                <option value="{{ cat.id }}"
+                  data-tipo="{{ cat.tipo }}"
+                  {% if transacao and transacao.categoria_id == cat.id %}selected{% endif %}>
+                  {{ cat.nome }}
+                </option>
               {% endfor %}
             </select>
           </div>
@@ -73,9 +87,10 @@
             <select name="forma_pagamento_id" class="form-select">
               <option value="">Não informar</option>
               {% for f in formas %}
-              <option value="{{ f.id }}" {% if transacao and transacao.forma_pagamento_id==f.id %}selected{% endif %}>
-                {{ f.nome }}
-              </option>
+                <option value="{{ f.id }}"
+                  {% if transacao and transacao.forma_pagamento_id == f.id %}selected{% endif %}>
+                  {{ f.nome }}
+                </option>
               {% endfor %}
             </select>
           </div>
@@ -86,9 +101,10 @@
             <select name="forma_origem_id" class="form-select">
               <option value="">Não informar</option>
               {% for f in formas %}
-              <option value="{{ f.id }}" {% if transacao and transacao.forma_origem_id==f.id %}selected{% endif %}>
-                {{ f.nome }}
-              </option>
+                <option value="{{ f.id }}"
+                  {% if transacao and transacao.forma_origem_id == f.id %}selected{% endif %}>
+                  {{ f.nome }}
+                </option>
               {% endfor %}
             </select>
           </div>
@@ -99,9 +115,10 @@
             <select name="forma_origem_id" class="form-select">
               <option value="" disabled selected>Selecione a origem</option>
               {% for f in formas %}
-              <option value="{{ f.id }}" {% if transacao and transacao.forma_origem_id==f.id %}selected{% endif %}>
-                {{ f.nome }}
-              </option>
+                <option value="{{ f.id }}"
+                  {% if transacao and transacao.forma_origem_id == f.id %}selected{% endif %}>
+                  {{ f.nome }}
+                </option>
               {% endfor %}
             </select>
           </div>
@@ -111,9 +128,10 @@
             <select name="forma_destino_id" class="form-select">
               <option value="" disabled selected>Selecione o destino</option>
               {% for f in formas %}
-              <option value="{{ f.id }}" {% if transacao and transacao.forma_destino_id==f.id %}selected{% endif %}>
-                {{ f.nome }}
-              </option>
+                <option value="{{ f.id }}"
+                  {% if transacao and transacao.forma_destino_id == f.id %}selected{% endif %}>
+                  {{ f.nome }}
+                </option>
               {% endfor %}
             </select>
           </div>
@@ -153,43 +171,42 @@
     </thead>
     <tbody>
       {% for trans in transacoes %}
-      <tr>
-        <td class="text-center">{{ trans.descricao }}</td>
-        <td style="white-space:nowrap;"><strong>R$ {{ "%.2f"|format(trans.valor|float) }}</strong></td>
-        <td style="white-space:nowrap;">{{ trans.data | data_br }}</td>
-        <td>
-          {% if trans.tipo == "entrada" %}
-          <span class="badge-entrada">Entrada</span>
-          {% elif trans.tipo == "saida" %}
-          <span class="badge-saida">Saída</span>
-          {% else %}
-          <span class="badge bg-secondary">Transferência</span>
-          {% endif %}
-        </td>
-        <td>{{ trans.categoria.nome if trans.categoria else '-' }}</td>
-        <td>
-          {% if trans.tipo == "transferencia" %}
-          {{ trans.origem.nome if trans.origem else '?' }} → {{ trans.destino.nome if trans.destino else '?' }}
-          {% elif trans.tipo == "saida" %}
-          {{ trans.forma.nome if trans.forma else '-' }}
-          {% elif trans.origem %}
-          ← {{ trans.origem.nome }}
-          {% else %}
-          -
-          {% endif %}
-        </td>
-        <td>
-          <a class="table-action" href="{{ url_for('transacoes.transacoes', id=trans.id) }}" title="Editar">
-            <i class="bi bi-pencil"></i>
-          </a>
-        </td>
-        <td>
-          <a class="table-action delete" href="{{ url_for('transacoes.transacoes', delete_transacao=trans.id) }}"
-            onclick="return confirm('Tem certeza?')" title="Excluir">
-            <i class="bi bi-trash"></i>
-          </a>
-        </td>
-      </tr>
+        <tr>
+          <td class="text-center">{{ trans.descricao }}</td>
+          <td style="white-space:nowrap;"><strong>R$ {{ "%.2f"|format(trans.valor|float) }}</strong></td>
+          <td style="white-space:nowrap;">{{ trans.data | data_br }}</td>
+          <td>
+            {% if trans.tipo == "entrada" %}
+              <span class="badge-entrada">Entrada</span>
+            {% elif trans.tipo == "saida" %}
+              <span class="badge-saida">Saída</span>
+            {% else %}
+              <span class="badge bg-secondary">Transferência</span>
+            {% endif %}
+          </td>
+          <td>{{ trans.categoria.nome if trans.categoria else '-' }}</td>
+          <td>
+            {% if trans.tipo == "transferencia" %}
+              {{ trans.origem.nome if trans.origem else '?' }} → {{ trans.destino.nome if trans.destino else '?' }}
+            {% elif trans.tipo == "saida" %}
+              {{ trans.forma.nome if trans.forma else '-' }}
+            {% elif trans.origem %}
+              ← {{ trans.origem.nome }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td>
+            <a class="table-action" href="{{ url_for('transacoes.transacoes', id=trans.id) }}" title="Editar">
+              <i class="bi bi-pencil"></i>
+            </a>
+          </td>
+          <td>
+            <a class="table-action delete" href="{{ url_for('transacoes.transacoes', delete_transacao=trans.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
+              <i class="bi bi-trash"></i>
+            </a>
+          </td>
+        </tr>
       {% endfor %}
     </tbody>
   </table>
@@ -200,10 +217,10 @@
   const tipoCampo = document.querySelector('select[name="tipo"]')
 
   const campos = {
-    categoria: document.getElementById('campo-categoria'),
-    pagamento: document.getElementById('campo-pagamento'),
-    origem: document.getElementById('campo-origem'),
-    transfOrigem: document.getElementById('campo-transf-origem'),
+    categoria:     document.getElementById('campo-categoria'),
+    pagamento:     document.getElementById('campo-pagamento'),
+    origem:        document.getElementById('campo-origem'),
+    transfOrigem:  document.getElementById('campo-transf-origem'),
     transfDestino: document.getElementById('campo-transf-destino'),
   }
 
@@ -221,31 +238,46 @@
     }
   }
 
+  function filtrarCategorias(tipo) {
+    const selectCat = campos.categoria.querySelector('select')
+    selectCat.querySelectorAll('option').forEach(opt => {
+      if (!opt.value) return // mantém o placeholder
+      opt.hidden = opt.dataset.tipo !== tipo
+    })
+    // Limpa seleção se a categoria atual não for do tipo correto
+    const selecionada = selectCat.selectedOptions[0]
+    if (selecionada && selecionada.dataset.tipo && selecionada.dataset.tipo !== tipo) {
+      selectCat.value = ''
+    }
+  }
+
   function atualizar(animado = true) {
-    const tipo = tipoCampo.value
-    const isEntrada = tipo === 'entrada'
-    const isSaida = tipo === 'saida'
+    const tipo            = tipoCampo.value
+    const isEntrada       = tipo === 'entrada'
+    const isSaida         = tipo === 'saida'
     const isTransferencia = tipo === 'transferencia'
 
-    mostrar(campos.categoria, isEntrada || isSaida, animado)
-    mostrar(campos.pagamento, isSaida, animado)
-    mostrar(campos.origem, isEntrada, animado)
-    mostrar(campos.transfOrigem, isTransferencia, animado)
-    mostrar(campos.transfDestino, isTransferencia, animado)
+    mostrar(campos.categoria,     isEntrada || isSaida, animado)
+    mostrar(campos.pagamento,     isSaida,              animado)
+    mostrar(campos.origem,        isEntrada,            animado)
+    mostrar(campos.transfOrigem,  isTransferencia,      animado)
+    mostrar(campos.transfDestino, isTransferencia,      animado)
 
-    campos.categoria.querySelector('select').required = isEntrada || isSaida
-    campos.transfOrigem.querySelector('select').required = isTransferencia
+    campos.categoria.querySelector('select').required     = isEntrada || isSaida
+    campos.transfOrigem.querySelector('select').required  = isTransferencia
     campos.transfDestino.querySelector('select').required = isTransferencia
+
+    if (isEntrada || isSaida) filtrarCategorias(tipo)
   }
 
   tipoCampo.addEventListener('change', () => atualizar(true))
   atualizar(false)
 
   // ── Ordenação da tabela ───────────────────────────────────────────
-  const tabela = document.getElementById('tabela-transacoes')
-  const tbody = tabela.querySelector('tbody')
+  const tabela  = document.getElementById('tabela-transacoes')
+  const tbody   = tabela.querySelector('tbody')
   let ultimaCol = -1
-  let ordemAsc = true
+  let ordemAsc  = true
 
   document.querySelectorAll('th.sortable').forEach(th => {
     th.addEventListener('click', () => {
@@ -254,11 +286,10 @@
       if (ultimaCol === col) {
         ordemAsc = !ordemAsc
       } else {
-        ordemAsc = true
+        ordemAsc  = true
         ultimaCol = col
       }
 
-      // Atualiza ícones
       document.querySelectorAll('th.sortable .sort-icon').forEach(i => {
         i.className = 'bi bi-chevron-expand sort-icon'
       })
@@ -266,7 +297,6 @@
         ? 'bi bi-chevron-up sort-icon'
         : 'bi bi-chevron-down sort-icon'
 
-      // Ordena as linhas
       const linhas = Array.from(tbody.querySelectorAll('tr'))
       linhas.sort((a, b) => {
         const textoA = a.cells[col]?.innerText.trim().toLowerCase() || ''
