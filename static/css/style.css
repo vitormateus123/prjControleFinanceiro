@@ -466,3 +466,26 @@ a {
   transition: opacity 0.3s ease;
   opacity: 0;
 }
+
+/* ─── CABEÇALHO ORDENÁVEL ─────────────────────────────── */
+.table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background .2s ease;
+}
+.table thead th.sortable:hover {
+  background: rgba(0, 168, 232, 0.15);
+}
+.table thead th.sortable .sort-icon {
+  opacity: 0.45;
+  font-size: 0.7rem;
+  margin-left: 4px;
+  vertical-align: middle;
+  transition: opacity .2s;
+}
+.table thead th.sortable:hover .sort-icon,
+.table thead th.sortable .bi-chevron-up,
+.table thead th.sortable .bi-chevron-down {
+  opacity: 1;
+}
