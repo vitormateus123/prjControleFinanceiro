@@ -4,7 +4,7 @@
 
 <div class="row g-4">
 
-  <!-- FORMULÁRIO -->
+  <!-- FORMULÁRIO DE CADASTRO -->
   <div class="col-lg-4">
     <div class="card overflow-hidden">
 
@@ -15,7 +15,7 @@
       </div>
 
       <div class="card-body-form">
-        <form method="POST" action="{% if pagamento %}{{ url_for('pagamentos', id=pagamento.id) }}{% else %}{{ url_for('pagamentos') }}{% endif %}">
+        <form method="POST" action="{{ url_for('pagamentos') }}">
 
           <div class="mb-4">
             <label class="form-label">Nome da forma</label>
@@ -23,7 +23,6 @@
               type="text"
               name="nome"
               class="form-control"
-              value="{{ pagamento.nome if pagamento else '' }}"
               placeholder="Ex: Cartão de crédito, Pix, Dinheiro"
               required>
           </div>
@@ -60,9 +59,10 @@
             <tr>
               <td class="text-center fw-500">{{ pag.nome }}</td>
               <td>
-                <a class="table-action" href="{{ url_for('pagamentos', id=pag.id) }}" title="Editar">
+                <button type="button" class="table-action border-0 bg-transparent" title="Editar"
+                  onclick="abrirModal({{ pag.id }}, '{{ pag.nome | e }}')">
                   <i class="bi bi-pencil"></i>
-                </a>
+                </button>
               </td>
               <td>
                 <a class="table-action delete" href="{{ url_for('pagamentos', delete_pagamento=pag.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
@@ -78,7 +78,49 @@
   </div>
 </div>
 
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--r-md); overflow:hidden;">
+
+      <div class="card-form-header" style="border-radius:0;">
+        <h3 id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar Forma de Pagamento</h3>
+        <p>Atualize o nome da forma de pagamento.</p>
+        <span class="header-icon">✏️</span>
+      </div>
+
+      <div class="card-body-form">
+        <form id="formEditar" method="POST" action="">
+
+          <div class="mb-4">
+            <label class="form-label">Nome da forma</label>
+            <input type="text" id="edit-nome" name="nome" class="form-control" required>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-custom flex-fill">
+              <i class="bi bi-check2-circle me-2"></i>Salvar
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
+  function abrirModal(id, nome) {
+    document.getElementById('edit-nome').value = nome
+    document.getElementById('formEditar').action = `/pagamentos/${id}`
+    new bootstrap.Modal(document.getElementById('modalEditar')).show()
+  }
+
   const tabela  = document.getElementById('tabela-pagamentos')
   const tbody   = tabela.querySelector('tbody')
   let ultimaCol = -1
@@ -87,28 +129,14 @@
   document.querySelectorAll('th.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = parseInt(th.dataset.col)
-
-      if (ultimaCol === col) {
-        ordemAsc = !ordemAsc
-      } else {
-        ordemAsc  = true
-        ultimaCol = col
-      }
-
-      document.querySelectorAll('th.sortable .sort-icon').forEach(i => {
-        i.className = 'bi bi-chevron-expand sort-icon'
-      })
-      th.querySelector('.sort-icon').className = ordemAsc
-        ? 'bi bi-chevron-up sort-icon'
-        : 'bi bi-chevron-down sort-icon'
-
+      if (ultimaCol === col) { ordemAsc = !ordemAsc } else { ordemAsc = true; ultimaCol = col }
+      document.querySelectorAll('th.sortable .sort-icon').forEach(i => { i.className = 'bi bi-chevron-expand sort-icon' })
+      th.querySelector('.sort-icon').className = ordemAsc ? 'bi bi-chevron-up sort-icon' : 'bi bi-chevron-down sort-icon'
       const linhas = Array.from(tbody.querySelectorAll('tr'))
       linhas.sort((a, b) => {
         const textoA = a.cells[col]?.innerText.trim().toLowerCase() || ''
         const textoB = b.cells[col]?.innerText.trim().toLowerCase() || ''
-        return ordemAsc
-          ? textoA.localeCompare(textoB, 'pt-BR')
-          : textoB.localeCompare(textoA, 'pt-BR')
+        return ordemAsc ? textoA.localeCompare(textoB, 'pt-BR') : textoB.localeCompare(textoA, 'pt-BR')
       })
       linhas.forEach(linha => tbody.appendChild(linha))
     })

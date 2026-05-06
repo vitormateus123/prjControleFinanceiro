@@ -4,7 +4,7 @@
 
 <div class="row g-4">
 
-  <!-- FORMULÁRIO -->
+  <!-- FORMULÁRIO DE CADASTRO -->
   <div class="col-lg-4">
     <div class="card overflow-hidden">
 
@@ -15,18 +15,18 @@
       </div>
 
       <div class="card-body-form">
-        <form method="POST" action="{% if categoria %}{{ url_for('categorias', id=categoria.id) }}{% else %}{{ url_for('categorias') }}{% endif %}">
+        <form method="POST" action="{{ url_for('categorias') }}">
 
           <div class="mb-3">
             <label class="form-label">Nome</label>
-            <input type="text" name="nome" value="{{ categoria.nome if categoria else '' }}" class="form-control" placeholder="Ex: Alimentação, Salário..." required>
+            <input type="text" name="nome" class="form-control" placeholder="Ex: Alimentação, Salário..." required>
           </div>
 
           <div class="mb-4">
             <label class="form-label">Tipo</label>
             <select name="tipo" class="form-select" required>
-              <option value="entrada" {% if categoria and categoria.tipo == "entrada" %}selected{% endif %}>📈 Entrada</option>
-              <option value="saida"   {% if categoria and categoria.tipo == "saida"   %}selected{% endif %}>📉 Saída</option>
+              <option value="entrada">📈 Entrada</option>
+              <option value="saida">📉 Saída</option>
             </select>
           </div>
 
@@ -70,9 +70,10 @@
                 {% endif %}
               </td>
               <td>
-                <a class="table-action" href="{{ url_for('categorias', id=cat.id) }}" title="Editar">
+                <button type="button" class="table-action border-0 bg-transparent" title="Editar"
+                  onclick="abrirModal({{ cat.id }}, '{{ cat.nome | e }}', '{{ cat.tipo }}')">
                   <i class="bi bi-pencil"></i>
-                </a>
+                </button>
               </td>
               <td>
                 <a class="table-action delete" href="{{ url_for('categorias', delete_categoria=cat.id) }}" onclick="return confirm('Tem certeza?')" title="Excluir">
@@ -88,7 +89,58 @@
   </div>
 </div>
 
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--r-md); overflow:hidden;">
+
+      <div class="card-form-header" style="border-radius:0;">
+        <h3 id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar Categoria</h3>
+        <p>Atualize as informações da categoria.</p>
+        <span class="header-icon">✏️</span>
+      </div>
+
+      <div class="card-body-form">
+        <form id="formEditar" method="POST" action="">
+
+          <div class="mb-3">
+            <label class="form-label">Nome</label>
+            <input type="text" id="edit-nome" name="nome" class="form-control" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Tipo</label>
+            <select id="edit-tipo" name="tipo" class="form-select" required>
+              <option value="entrada">📈 Entrada</option>
+              <option value="saida">📉 Saída</option>
+            </select>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-custom flex-fill">
+              <i class="bi bi-check2-circle me-2"></i>Salvar
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
+  function abrirModal(id, nome, tipo) {
+    document.getElementById('edit-nome').value = nome
+    document.getElementById('edit-tipo').value = tipo
+    document.getElementById('formEditar').action = `/categorias/${id}`
+    new bootstrap.Modal(document.getElementById('modalEditar')).show()
+  }
+
   const tabela  = document.getElementById('tabela-categorias')
   const tbody   = tabela.querySelector('tbody')
   let ultimaCol = -1
@@ -97,28 +149,14 @@
   document.querySelectorAll('th.sortable').forEach(th => {
     th.addEventListener('click', () => {
       const col = parseInt(th.dataset.col)
-
-      if (ultimaCol === col) {
-        ordemAsc = !ordemAsc
-      } else {
-        ordemAsc  = true
-        ultimaCol = col
-      }
-
-      document.querySelectorAll('th.sortable .sort-icon').forEach(i => {
-        i.className = 'bi bi-chevron-expand sort-icon'
-      })
-      th.querySelector('.sort-icon').className = ordemAsc
-        ? 'bi bi-chevron-up sort-icon'
-        : 'bi bi-chevron-down sort-icon'
-
+      if (ultimaCol === col) { ordemAsc = !ordemAsc } else { ordemAsc = true; ultimaCol = col }
+      document.querySelectorAll('th.sortable .sort-icon').forEach(i => { i.className = 'bi bi-chevron-expand sort-icon' })
+      th.querySelector('.sort-icon').className = ordemAsc ? 'bi bi-chevron-up sort-icon' : 'bi bi-chevron-down sort-icon'
       const linhas = Array.from(tbody.querySelectorAll('tr'))
       linhas.sort((a, b) => {
         const textoA = a.cells[col]?.innerText.trim().toLowerCase() || ''
         const textoB = b.cells[col]?.innerText.trim().toLowerCase() || ''
-        return ordemAsc
-          ? textoA.localeCompare(textoB, 'pt-BR')
-          : textoB.localeCompare(textoA, 'pt-BR')
+        return ordemAsc ? textoA.localeCompare(textoB, 'pt-BR') : textoB.localeCompare(textoA, 'pt-BR')
       })
       linhas.forEach(linha => tbody.appendChild(linha))
     })

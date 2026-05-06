@@ -535,3 +535,209 @@ a {
   color: white;
   font-size: 0.75rem;
 }
+/* ─── DASHBOARD (index) ───────────────────────────────── */
+.metric-card {
+  border-radius: 18px !important;
+  border: 1.5px solid var(--cinza-borda);
+  background: var(--branco);
+  box-shadow: var(--shadow-sm);
+  padding: 24px 28px;
+  transition: box-shadow .25s, transform .25s;
+}
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.metric-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cinza-texto);
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.ratio-bar {
+  height: 10px;
+  border-radius: 99px;
+  background: #eef2f7;
+  overflow: hidden;
+}
+.ratio-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(.4, 0, .2, 1);
+  width: 0%;
+}
+
+.tx-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf2f7;
+}
+.tx-item:last-child { border-bottom: none; }
+
+.tx-dot {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.tx-dot.entrada { background: #dcfce7; color: #15803d; }
+.tx-dot.saida   { background: #fee2e2; color: #b91c1c; }
+
+.tx-desc {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #162d42;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+.tx-cat {
+  font-size: 0.72rem;
+  color: var(--cinza-texto);
+  margin-top: 1px;
+}
+
+.tx-valor {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tx-valor.entrada { color: #16a34a; }
+.tx-valor.saida   { color: #dc2626; }
+
+.tx-data {
+  font-size: 0.7rem;
+  color: #9bb5c8;
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--cinza-texto);
+}
+.empty-state i {
+  font-size: 2.5rem;
+  opacity: .35;
+  display: block;
+  margin-bottom: 10px;
+}
+.empty-state p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.dash-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cinza-texto);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dash-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cinza-borda);
+}
+
+/* card A Receber — ícone verde */
+.card-home .card-icon-receber {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* ─── DASHBOARD — classes auxiliares ─────────────────── */
+.card-home-title {
+  color: #0d3b66;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.card-home-desc {
+  font-size: .875rem;
+}
+.metric-sub {
+  font-size: .72rem;
+  color: var(--cinza-texto);
+}
+.ratio-label {
+  font-size: .8rem;
+  font-weight: 600;
+}
+.ratio-label-entrada { color: #16a34a; }
+.ratio-label-saida   { color: #dc2626; }
+.ratio-fill-entrada  { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.ratio-fill-saida    { background: linear-gradient(90deg, #f87171, #dc2626); }
+.ratio-circle-icon   { font-size: .45rem; vertical-align: middle; }
+.ratio-result-wrap {
+  border-top: 1px solid var(--cinza-borda);
+  padding-top: 16px;
+}
+.ratio-result-label {
+  font-size: .82rem;
+  color: var(--cinza-texto);
+}
+.ratio-result-value { font-size: .95rem; }
+.dash-ver-todas {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--azul-secundario);
+  white-space: nowrap;
+  margin-left: 12px;
+  text-decoration: none;
+}
+.dash-ver-todas:hover { color: var(--azul-hover); }
+.tx-grow { flex-grow: 1; min-width: 0; }
+.nav-logout { opacity: .7; }
+.dash-add-link {
+  color: var(--azul-secundario);
+  font-weight: 600;
+}
+
+/* card-icon padrão azul (Transações, Categorias, Pagamentos) */
+.card-icon-blue {
+  background: var(--azul-light);
+  color: var(--azul-hover);
+}
+
+/* título de seção que precisa crescer (flex) */
+.dash-section-title.flex-grow { flex: 1; }
