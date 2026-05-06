@@ -4,7 +4,9 @@ from datetime import datetime
 from config import SENHA
 import os
 from routes.transacoes import transacoes_bp
+from routes.a_receber import a_receber_bp
 from utils import get_supabase, login_required
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__,
@@ -14,6 +16,7 @@ app = Flask(__name__,
 app.secret_key = os.environ.get("SECRET_KEY")
 
 app.register_blueprint(transacoes_bp)
+app.register_blueprint(a_receber_bp)
 
 # ---------------- LOGIN ----------------
 
