@@ -25,7 +25,7 @@ def a_receber(id=None):
         devedor      = request.form.get("devedor", "").strip()
         valor_total  = float(request.form.get("valor_total"))
         num_parcelas = int(request.form.get("num_parcelas", 1))
-        observacao   = (request.form.get("observacao", "") or "").strip() or ""
+        observacao   = (request.form.get("observacao", "") or "").strip() or None
 
         if id:
             sb.table("a_receber").update({
@@ -35,26 +35,25 @@ def a_receber(id=None):
                 "num_parcelas": num_parcelas,
                 "observacao":   observacao
             }).eq("id", id).execute()
-            flash("Registro atualizado com sucesso!", "success")
 
-            # Apaga parcelas antigas não recebidas e recria
+            # Apaga parcelas pendentes e recria
             sb.table("a_receber_parcela").delete().eq("a_receber_id", id).eq("recebido", False).execute()
 
-            # Conta quantas já foram recebidas
-            recebidas = sb.table("a_receber_parcela").select("numero").eq("a_receber_id", id).eq("recebido", True).execute().data
+            # Preserva números já recebidos
+            recebidas         = sb.table("a_receber_parcela").select("numero").eq("a_receber_id", id).eq("recebido", True).execute().data
             numeros_recebidos = {p["numero"] for p in recebidas}
-            parcelas_faltantes = num_parcelas - len(numeros_recebidos)
+            proximos_numeros  = [n for n in range(1, num_parcelas + 1) if n not in numeros_recebidos]
 
-            if parcelas_faltantes > 0:
+            if proximos_numeros:
                 valor_parcela = round(valor_total / num_parcelas, 2)
-                proximos_numeros = [n for n in range(1, num_parcelas + 1) if n not in numeros_recebidos]
                 novas_parcelas = [
                     {"a_receber_id": id, "numero": n, "valor": valor_parcela}
                     for n in proximos_numeros
                 ]
                 sb.table("a_receber_parcela").insert(novas_parcelas).execute()
 
-    flash("Registro atualizado com sucesso!", "success")
+            flash("Registro atualizado com sucesso!", "success")
+
         else:
             res = sb.table("a_receber").insert({
                 "descricao":    descricao,
