@@ -5,48 +5,43 @@
 
 /* ─── Sobrescreve tokens do Bootstrap 5 ─────────────── */
 :root {
-  /* Paleta principal */
   --azul-principal:   #0d3b66;
   --azul-secundario:  #00a8e8;
   --azul-hover:       #0077b6;
   --azul-light:       #e6f4fc;
   --azul-muted:       rgba(0, 168, 232, 0.08);
 
-  /* Neutros */
   --cinza-fundo:      #eef2f7;
   --cinza-texto:      #5e7a94;
   --cinza-borda:      #d8e4ef;
   --branco:           #ffffff;
 
-  /* Sombras com cor */
   --shadow-xs:  0 1px 4px rgba(13, 59, 102, 0.07);
   --shadow-sm:  0 2px 12px rgba(13, 59, 102, 0.09);
   --shadow-md:  0 6px 24px rgba(13, 59, 102, 0.13);
   --shadow-lg:  0 12px 40px rgba(13, 59, 102, 0.18);
 
-  /* Radii */
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 16px;
   --r-xl: 22px;
 
-  /* Bootstrap overrides */
-  --bs-primary:           #00a8e8;
-  --bs-primary-rgb:       0, 168, 232;
-  --bs-body-bg:           #eef2f7;
-  --bs-body-color:        #162d42;
-  --bs-body-font-family:  'Poppins', sans-serif;
-  --bs-border-color:      #d8e4ef;
-  --bs-border-radius:     8px;
-  --bs-border-radius-lg:  12px;
+  --bs-primary:            #00a8e8;
+  --bs-primary-rgb:        0, 168, 232;
+  --bs-body-bg:            #eef2f7;
+  --bs-body-color:         #162d42;
+  --bs-body-font-family:   'Poppins', sans-serif;
+  --bs-border-color:       #d8e4ef;
+  --bs-border-radius:      8px;
+  --bs-border-radius-lg:   12px;
   --bs-card-border-radius: 16px;
-  --bs-card-border-color: #d8e4ef;
-  --bs-card-box-shadow:   0 2px 12px rgba(13,59,102,0.09);
-  --bs-link-color:        #00a8e8;
-  --bs-link-hover-color:  #0077b6;
-  --bs-table-striped-bg:  #f5f9fd;
-  --bs-table-hover-bg:    rgba(0,168,232,0.06);
-  --bs-focus-ring-color:  rgba(0,168,232,0.25);
+  --bs-card-border-color:  #d8e4ef;
+  --bs-card-box-shadow:    0 2px 12px rgba(13,59,102,0.09);
+  --bs-link-color:         #00a8e8;
+  --bs-link-hover-color:   #0077b6;
+  --bs-table-striped-bg:   #f5f9fd;
+  --bs-table-hover-bg:     rgba(0,168,232,0.06);
+  --bs-focus-ring-color:   rgba(0,168,232,0.25);
 }
 
 /* ─── Reset & Base ───────────────────────────────────── */
@@ -181,7 +176,6 @@ body {
 
 .card-body-form { padding: 28px 32px 32px; }
 
-/* Home feature cards */
 .card-home {
   text-align: center;
   padding: 32px 20px;
@@ -236,7 +230,6 @@ body {
 }
 .form-control::placeholder { color: #9bb5c8; }
 
-/* Input group com prefixo */
 .input-group-text {
   background: var(--azul-light);
   border: 1.5px solid var(--cinza-borda);
@@ -319,14 +312,13 @@ body {
   vertical-align: middle;
 }
 
-/* Striped suave */
 .table-striped > tbody > tr:nth-of-type(odd) > * {
   background-color: #f8fbfe;
   --bs-table-bg-type: transparent;
   color: inherit;
 }
 
-/* Badges de tipo */
+/* ─── BADGES ──────────────────────────────────────────── */
 .badge-entrada {
   background: #d1f5e8;
   color: #0d7045;
@@ -346,7 +338,7 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* Ações na tabela */
+/* ─── AÇÕES NA TABELA ─────────────────────────────────── */
 .table-action {
   display: inline-flex;
   align-items: center;
@@ -444,7 +436,6 @@ a {
   text-decoration: none;
 }
 
-/* Container form */
 .container-form {
   max-width: 540px;
   margin-top: 0;
@@ -460,11 +451,6 @@ a {
     padding: 0.65rem 0.55rem;
     font-size: 0.82rem;
   }
-}
-
-#campo-pagamento {
-  transition: opacity 0.3s ease;
-  opacity: 0;
 }
 
 /* ─── CABEÇALHO ORDENÁVEL ─────────────────────────────── */
@@ -490,61 +476,62 @@ a {
   opacity: 1;
 }
 
+/* ─── PARCELAS (A RECEBER) ────────────────────────────── */
 .parcela-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: var(--azul-light);
-    border: 1.5px solid var(--cinza-borda);
-    border-radius: var(--r-sm);
-    padding: 8px 12px;
-    min-width: 80px;
-    transition: all .2s;
-  }
-  .parcela-item.recebida {
-    background: #d1f5e8;
-    border-color: #a7e9cb;
-  }
-  .parcela-numero {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--cinza-texto);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .parcela-valor {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--azul-principal);
-  }
-  .parcela-item.recebida .parcela-valor {
-    color: #0d7045;
-  }
-  .parcela-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--azul-secundario);
-    color: white;
-    font-size: 0.75rem;
-    text-decoration: none;
-    transition: all .2s;
-  }
-  .parcela-btn:hover {
-    background: var(--azul-hover);
-    transform: scale(1.15);
-    color: white;
-  }
-  .parcela-check {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: #0d7045;
-    color: white;
-    font-size: 0.75rem;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--azul-light);
+  border: 1.5px solid var(--cinza-borda);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  min-width: 80px;
+  transition: all .2s;
+}
+.parcela-item.recebida {
+  background: #d1f5e8;
+  border-color: #a7e9cb;
+}
+.parcela-numero {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--cinza-texto);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.parcela-valor {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--azul-principal);
+}
+.parcela-item.recebida .parcela-valor {
+  color: #0d7045;
+}
+.parcela-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--azul-secundario);
+  color: white;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: all .2s;
+}
+.parcela-btn:hover {
+  background: var(--azul-hover);
+  transform: scale(1.15);
+  color: white;
+}
+.parcela-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #0d7045;
+  color: white;
+  font-size: 0.75rem;
+}

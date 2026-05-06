@@ -2,10 +2,9 @@
 
 {% block content %}
 
-<div class="row g-4">
-
-  <!-- FORMULÁRIO -->
-  <div class="col-lg-4">
+<!-- FORMULÁRIO DE CADASTRO -->
+<div class="row justify-content-center mb-4">
+  <div class="col-lg-6">
     <div class="card overflow-hidden">
 
       <div class="card-form-header">
@@ -15,28 +14,18 @@
       </div>
 
       <div class="card-body-form">
-        <form method="POST" action="{% if registro %}{{ url_for('a_receber.a_receber', id=registro.id) }}{% else %}{{ url_for('a_receber.a_receber') }}{% endif %}">
+        <form method="POST" action="{{ url_for('a_receber.a_receber') }}">
 
           <div class="mb-3">
             <label class="form-label">Descrição</label>
-            <input
-              type="text"
-              name="descricao"
-              class="form-control"
-              value="{{ registro.descricao if registro else '' }}"
-              placeholder="Ex: Empréstimo para João"
-              required>
+            <input type="text" name="descricao" class="form-control"
+              placeholder="Ex: Empréstimo para João" required>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Devedor</label>
-            <input
-              type="text"
-              name="devedor"
-              class="form-control"
-              value="{{ registro.devedor if registro else '' }}"
-              placeholder="Nome de quem deve"
-              required>
+            <input type="text" name="devedor" class="form-control"
+              placeholder="Nome de quem deve" required>
           </div>
 
           <div class="row g-3 mb-3">
@@ -44,35 +33,20 @@
               <label class="form-label">Valor total (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input
-                  type="number"
-                  name="valor_total"
-                  class="form-control"
-                  value="{{ registro.valor_total if registro else '' }}"
-                  step="0.01" min="0.01"
-                  placeholder="0,00"
-                  required>
+                <input type="number" name="valor_total" class="form-control"
+                  step="0.01" min="0.01" placeholder="0,00" required>
               </div>
             </div>
             <div class="col-6">
               <label class="form-label">Nº de parcelas</label>
-              <input
-                type="number"
-                name="num_parcelas"
-                class="form-control"
-                value="{{ registro.num_parcelas if registro else '1' }}"
-                min="1" max="99"
-                required>
+              <input type="number" name="num_parcelas" class="form-control"
+                value="1" min="1" max="99" required>
             </div>
           </div>
 
           <div class="mb-4">
             <label class="form-label">Observação <span class="text-muted">(opcional)</span></label>
-            <input
-              type="text"
-              name="observacao"
-              class="form-control"
-              value="{{ registro.observacao if registro else '' }}"
+            <input type="text" name="observacao" class="form-control"
               placeholder="Ex: Emprestado em dinheiro">
           </div>
 
@@ -87,93 +61,167 @@
 
     </div>
   </div>
+</div>
 
-  <!-- LISTA -->
-  <div class="col-lg-8">
-    <div class="section-title">
-      <span class="title-pill"></span>
-      Valores a receber
-    </div>
+<!-- LISTA -->
+<div class="section-title">
+  <span class="title-pill"></span>
+  Valores a receber
+</div>
 
-    {% for reg in registros %}
-      {% set total_parcelas = reg.parcelas | length %}
-      {% set recebidas = reg.parcelas | selectattr('recebido') | list | length %}
-      {% set todas_recebidas = recebidas == total_parcelas %}
+{% for reg in registros %}
+  {% set total_parcelas = reg.parcelas | length %}
+  {% set recebidas = reg.parcelas | selectattr('recebido') | list | length %}
+  {% set todas_recebidas = recebidas == total_parcelas %}
 
-      <div class="card mb-3 {{ 'opacity-50' if todas_recebidas else '' }}">
-        <div class="card-body p-3">
+  <div class="card mb-3 {{ 'opacity-50' if todas_recebidas else '' }}">
+    <div class="card-body p-3">
 
-          <!-- Cabeçalho do registro -->
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <div>
-              <div class="fw-700 text-dark" style="font-size:0.95rem;">{{ reg.descricao }}</div>
-              <div class="text-muted" style="font-size:0.82rem;">
-                <i class="bi bi-person me-1"></i>{{ reg.devedor }}
-                {% if reg.observacao %}
-                  · {{ reg.observacao }}
-                {% endif %}
-              </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              {% if todas_recebidas %}
-                <span class="badge-entrada">Concluído</span>
-              {% else %}
-                <span style="font-size:0.78rem; font-weight:600; color:var(--azul-principal);">
-                  {{ recebidas }}/{{ total_parcelas }} recebidas
-                </span>
-              {% endif %}
-              <a class="table-action" href="{{ url_for('a_receber.a_receber', id=reg.id) }}" title="Editar">
-                <i class="bi bi-pencil"></i>
-              </a>
-              <a class="table-action delete"
-                href="{{ url_for('a_receber.a_receber', delete_id=reg.id) }}"
-                onclick="return confirm('Excluir este registro e todas as parcelas?')"
-                title="Excluir">
-                <i class="bi bi-trash"></i>
-              </a>
-            </div>
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="fw-700 text-dark" style="font-size:0.95rem;">{{ reg.descricao }}</div>
+          <div class="text-muted" style="font-size:0.82rem;">
+            <i class="bi bi-person me-1"></i>{{ reg.devedor }}
+            {% if reg.observacao %} · {{ reg.observacao }}{% endif %}
           </div>
-
-          <!-- Barra de progresso -->
-          {% if total_parcelas > 1 %}
-            <div class="progress mb-3" style="height:5px; border-radius:4px;">
-              <div class="progress-bar"
-                role="progressbar"
-                style="width: {{ (recebidas / total_parcelas * 100) | int }}%; background: var(--azul-secundario);">
-              </div>
-            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          {% if todas_recebidas %}
+            <span class="badge-entrada">Concluído</span>
+          {% else %}
+            <span style="font-size:0.78rem; font-weight:600; color:var(--azul-principal);">
+              {{ recebidas }}/{{ total_parcelas }} recebidas
+            </span>
           {% endif %}
 
-          <!-- Parcelas -->
-          <div class="d-flex flex-wrap gap-2">
-            {% for parcela in reg.parcelas %}
-              <div class="parcela-item {{ 'recebida' if parcela.recebido else '' }}">
-                <div class="parcela-numero">{{ parcela.numero }}/{{ total_parcelas }}</div>
-                <div class="parcela-valor">R$ {{ "%.2f"|format(parcela.valor|float) }}</div>
-                {% if not parcela.recebido %}
-                  <a href="{{ url_for('a_receber.receber_parcela', parcela_id=parcela.id) }}"
-                    onclick="return confirm('Confirmar recebimento e gerar entrada automática?')"
-                    class="parcela-btn"
-                    title="Marcar como recebido">
-                    <i class="bi bi-check-lg"></i>
-                  </a>
-                {% else %}
-                  <span class="parcela-check"><i class="bi bi-check-lg"></i></span>
-                {% endif %}
-              </div>
-            {% endfor %}
-          </div>
+          <button type="button" class="table-action border-0 bg-transparent" title="Editar"
+            onclick="abrirModal(
+              {{ reg.id }},
+              '{{ reg.descricao | e }}',
+              '{{ reg.devedor | e }}',
+              {{ reg.valor_total }},
+              {{ reg.num_parcelas }},
+              '{{ reg.observacao or '' | e }}'
+            )">
+            <i class="bi bi-pencil"></i>
+          </button>
 
+          <a class="table-action delete"
+            href="{{ url_for('a_receber.a_receber', delete_id=reg.id) }}"
+            onclick="return confirm('Excluir este registro e todas as parcelas?')"
+            title="Excluir">
+            <i class="bi bi-trash"></i>
+          </a>
         </div>
       </div>
-    {% else %}
-      <div class="text-center text-muted py-5">
-        <i class="bi bi-inbox" style="font-size:2rem; opacity:.4;"></i>
-        <p class="mt-2" style="font-size:0.9rem;">Nenhum valor a receber cadastrado.</p>
-      </div>
-    {% endfor %}
 
+      {% if total_parcelas > 1 %}
+        <div class="progress mb-3" style="height:5px; border-radius:4px;">
+          <div class="progress-bar" role="progressbar"
+            style="width: {{ (recebidas / total_parcelas * 100) | int }}%; background: var(--azul-secundario);">
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="d-flex flex-wrap gap-2">
+        {% for parcela in reg.parcelas | sort(attribute='numero') %}
+          <div class="parcela-item {{ 'recebida' if parcela.recebido else '' }}">
+            <div class="parcela-numero">{{ parcela.numero }}/{{ total_parcelas }}</div>
+            <div class="parcela-valor">R$ {{ "%.2f"|format(parcela.valor|float) }}</div>
+            {% if not parcela.recebido %}
+              <a href="{{ url_for('a_receber.receber_parcela', parcela_id=parcela.id) }}"
+                onclick="return confirm('Confirmar recebimento e gerar entrada automática?')"
+                class="parcela-btn" title="Marcar como recebido">
+                <i class="bi bi-check-lg"></i>
+              </a>
+            {% else %}
+              <span class="parcela-check"><i class="bi bi-check-lg"></i></span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+{% else %}
+  <div class="text-center text-muted py-5">
+    <i class="bi bi-inbox" style="font-size:2rem; opacity:.4;"></i>
+    <p class="mt-2" style="font-size:0.9rem;">Nenhum valor a receber cadastrado.</p>
+  </div>
+{% endfor %}
+
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: var(--r-md); overflow:hidden;">
+
+      <div class="card-form-header" style="border-radius:0;">
+        <h3 id="modalEditarLabel"><i class="bi bi-pencil-square me-2"></i>Editar Registro</h3>
+        <p>Atualize as informações do valor a receber.</p>
+        <span class="header-icon">✏️</span>
+      </div>
+
+      <div class="card-body-form">
+        <form id="formEditar" method="POST" action="">
+
+          <div class="mb-3">
+            <label class="form-label">Descrição</label>
+            <input type="text" id="edit-descricao" name="descricao" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Devedor</label>
+            <input type="text" id="edit-devedor" name="devedor" class="form-control" required>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Valor total (R$)</label>
+              <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="number" id="edit-valor" name="valor_total"
+                  class="form-control" step="0.01" min="0.01" required>
+              </div>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Nº de parcelas</label>
+              <input type="number" id="edit-parcelas" name="num_parcelas"
+                class="form-control" min="1" max="99" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Observação <span class="text-muted">(opcional)</span></label>
+            <input type="text" id="edit-observacao" name="observacao" class="form-control">
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-custom flex-fill">
+              <i class="bi bi-check2-circle me-2"></i>Salvar
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
   </div>
 </div>
+
+<script>
+  function abrirModal(id, descricao, devedor, valor, parcelas, observacao) {
+    document.getElementById('edit-descricao').value  = descricao
+    document.getElementById('edit-devedor').value    = devedor
+    document.getElementById('edit-valor').value      = valor
+    document.getElementById('edit-parcelas').value   = parcelas
+    document.getElementById('edit-observacao').value = observacao
+    document.getElementById('formEditar').action     = `/a-receber/${id}`
+    new bootstrap.Modal(document.getElementById('modalEditar')).show()
+  }
+</script>
 
 {% endblock %}
