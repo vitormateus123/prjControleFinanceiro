@@ -32,7 +32,7 @@ def a_receber(id=None):
                 "observacao": observacao
             }).eq("id", id).execute()
             flash("Registro atualizado com sucesso", "success")
-        else
+        else:
             sb.table("a_receber"),insert({
                 "descricao": descricao, "devedor": devedor,
                 "valor_total":valor_total, "num_parcelas": num_parcelas,
