@@ -106,7 +106,7 @@ def categorias(id=None):
         flash("Categoria excluída com sucesso!", "success")
         return redirect(url_for("categorias"))
 
-    categorias = sb.table("categoria").select("*").order("id", desc=False).execute().data
+    categorias = sb.table("categoria").select("*").order("nome").execute().data
     return render_template("categoria.html", categorias=categorias, categoria=categoria)
 
 # -------- PAGAMENTOS ----------
