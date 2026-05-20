@@ -33,8 +33,7 @@
               <label class="form-label">Valor total (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input type="number" name="valor_total" class="form-control"
-                  step="0.01" min="0.01" placeholder="0,00" required>
+                <input type="text" name="valor_total" class="form-control valor-monetario" placeholder="0,00" required>
               </div>
             </div>
             <div class="col-6">
@@ -222,6 +221,29 @@
     document.getElementById('formEditar').action     = `/a-receber/${id}`
     new bootstrap.Modal(document.getElementById('modalEditar')).show()
   }
+
+function aplicarMascaraMonetaria(input) {
+  input.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '');
+    if (!v) { this.value = ''; return; }
+    v = (parseInt(v) / 100).toFixed(2);
+    v = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    this.value = v;
+  });
+}
+
+document.querySelectorAll('.valor-monetario').forEach(aplicarMascaraMonetaria);
+
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', function () {
+    this.querySelectorAll('.valor-monetario').forEach(input => {
+      const num = parseFloat(
+        input.value.replace(/\./g, '').replace(',', '.')
+      );
+      input.value = isNaN(num) ? '' : num.toFixed(2);
+    });
+  });
+});
 </script>
 
 {% endblock %}

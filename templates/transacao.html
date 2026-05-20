@@ -26,7 +26,7 @@
               <label class="form-label">Valor (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input type="number" name="valor" class="form-control" step="0.01" min="0" placeholder="0,00" required>
+                <input type="text" name="valor" id="campo-valor-novo" class="form-control valor-monetario" placeholder="0,00" required>
               </div>
             </div>
             <div class="col-6">
@@ -43,6 +43,27 @@
               <option value="saida">📉 Saída</option>
               <option value="transferencia">🔄 Transferência</option>
             </select>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="chk-a-receber" name="salvar_como_a_receber">
+              <label class="form-check-label fw-500" for="chk-a-receber">
+                💰 Salvar como <strong>A Receber</strong>?
+              </label>
+            </div>
+          </div>
+
+          <div id="campos-a-receber" style="display:none; opacity:0; transition: opacity .3s;">
+            <div class="mb-3">
+              <label class="form-label">Devedor</label>
+              <input type="text" name="devedor" id="campo-devedor" class="form-control"
+                placeholder="Nome de quem vai pagar">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nº de parcelas</label>
+              <input type="number" name="num_parcelas" class="form-control" value="1" min="1" max="99">
+            </div>
           </div>
 
           <div class="mb-3" id="campo-categoria">
@@ -207,7 +228,7 @@
               <label class="form-label">Valor (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input type="number" id="edit-valor" name="valor" class="form-control" step="0.01" min="0" required>
+                <input type="text" id="edit-valor" name="valor" class="form-control valor-monetario" required>
               </div>
             </div>
             <div class="col-6">
@@ -430,6 +451,45 @@
       linhas.forEach(linha => tbody.appendChild(linha))
     })
   })
+
+function aplicarMascaraMonetaria(input) {
+  input.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '');
+    if (!v) { this.value = ''; return; }
+    v = (parseInt(v) / 100).toFixed(2);
+    v = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    this.value = v;
+  });
+}
+
+document.querySelectorAll('.valor-monetario').forEach(aplicarMascaraMonetaria);
+
+document.querySelectorAll('form').forEach(form => {
+  form.addEventListener('submit', function () {
+    this.querySelectorAll('.valor-monetario').forEach(input => {
+      const num = parseFloat(
+        input.value.replace(/\./g, '').replace(',', '.')
+      );
+      input.value = isNaN(num) ? '' : num.toFixed(2);
+    });
+  });
+});
+
+const chkAReceber    = document.getElementById('chk-a-receber');
+const camposAReceber = document.getElementById('campos-a-receber');
+const campoDevedor   = document.getElementById('campo-devedor');
+
+chkAReceber.addEventListener('change', function () {
+  if (this.checked) {
+    camposAReceber.style.display = 'block';
+    setTimeout(() => camposAReceber.style.opacity = '1', 10);
+    campoDevedor.required = true;
+  } else {
+    camposAReceber.style.opacity = '0';
+    setTimeout(() => camposAReceber.style.display = 'none', 300);
+    campoDevedor.required = false;
+  }
+});
 </script>
 
 {% endblock %}

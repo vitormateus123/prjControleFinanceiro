@@ -10,6 +10,37 @@ transacoes_bp = Blueprint("transacoes", __name__)
 def transacoes(id=None):
     sb = get_supabase()
 
+    if request.form.get("salvar_como_a_receber"):
+        descricao    = request.form.get("descricao", "").strip()
+        descricao    = descricao[0].upper() + descricao[1:] if descricao else descricao
+        devedor      = request.form.get("devedor", "").strip()
+        valor_raw    = request.form.get("valor")
+        num_parcelas = int(request.form.get("num_parcelas", 1))
+
+        try:
+            valor_total = float(valor_raw)
+        except (TypeError, ValueError):
+            flash("Valor inválido!", "danger")
+            return redirect(url_for("transacoes.transacoes"))
+
+        res = sb.table("a_receber").insert({
+            "descricao":    descricao,
+            "devedor":      devedor,
+            "valor_total":  valor_total,
+            "num_parcelas": num_parcelas,
+        }).execute()
+
+        novo_id       = res.data[0]["id"]
+        valor_parcela = round(valor_total / num_parcelas, 2)
+        parcelas      = [
+            {"a_receber_id": novo_id, "numero": i + 1, "valor": valor_parcela}
+            for i in range(num_parcelas)
+        ]
+        sb.table("a_receber_parcela").insert(parcelas).execute()
+
+        flash("Salvo em A Receber com sucesso!", "success")
+        return redirect(url_for("a_receber.a_receber"))
+
     if request.method == "POST":
         descricao          = request.form.get("descricao", "").strip()
         valor_raw          = request.form.get("valor")
