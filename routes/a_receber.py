@@ -91,33 +91,69 @@ def a_receber(id=None):
     return render_template("a_receber.html", registros=registros, registro=registro)
 
 
-@a_receber_bp.route("/a-receber/receber/<int:parcela_id>")
+@a_receber_bp.route("/a-receber/receber/<int:parcela_id>", methods=["POST"])
 @login_required
 def receber_parcela(parcela_id):
     sb = get_supabase()
 
-    res = sb.table("a_receber_parcela").select("*, a_receber(descricao, devedor)").eq("id", parcela_id).execute()
+    res = sb.table("a_receber_parcela").select("*, a_receber(id, descricao, devedor, num_parcelas)").eq("id", parcela_id).execute()
     if not res.data:
         flash("Parcela não encontrada!", "danger")
         return redirect(url_for("a_receber.a_receber"))
 
     parcela = res.data[0]
 
-    # Gera entrada automática
+    try:
+        valor_recebido = float(request.form.get("valor_recebido"))
+    except (TypeError, ValueError):
+        flash("Valor inválido!", "danger")
+        return redirect(url_for("a_receber.a_receber"))
+
+    if valor_recebido <= 0:
+        flash("O valor recebido deve ser maior que zero!", "danger")
+        return redirect(url_for("a_receber.a_receber"))
+
+    # Gera a transação de entrada pelo valor realmente recebido
     transacao = sb.table("transacao").insert({
         "descricao": f"{parcela['a_receber']['descricao']} ({parcela['a_receber']['devedor']})",
-        "valor":     parcela["valor"],
+        "valor":     valor_recebido,
         "data":      datetime.date.today().isoformat(),
         "tipo":      "entrada",
     }).execute()
 
     transacao_id = transacao.data[0]["id"]
 
-    # Marca parcela como recebida
+    # Marca a parcela atual como recebida (pelo valor que entrou)
     sb.table("a_receber_parcela").update({
         "recebido":     True,
+        "valor":        valor_recebido,
         "transacao_id": transacao_id
     }).eq("id", parcela_id).execute()
 
-    flash("Parcela recebida e entrada gerada automaticamente!", "success")
+    # Se recebeu menos do que o esperado, cria nova parcela com o restante
+    restante = round(parcela["valor"] - valor_recebido, 2)
+    if restante > 0.01:
+        a_receber_id  = parcela["a_receber"]["id"]
+        num_parcelas  = parcela["a_receber"]["num_parcelas"]
+
+        # Incrementa o total de parcelas do registro pai
+        sb.table("a_receber").update({
+            "num_parcelas": num_parcelas + 1
+        }).eq("id", a_receber_id).execute()
+
+        # Descobre o próximo número de parcela
+        todas = sb.table("a_receber_parcela").select("numero").eq("a_receber_id", a_receber_id).execute().data
+        proximo = max(p["numero"] for p in todas) + 1
+
+        sb.table("a_receber_parcela").insert({
+            "a_receber_id": a_receber_id,
+            "numero":       proximo,
+            "valor":        restante,
+            "recebido":     False
+        }).execute()
+
+        flash(f"Recebido R$ {valor_recebido:.2f}. Nova parcela de R$ {restante:.2f} criada para o restante.", "warning")
+    else:
+        flash("Parcela recebida integralmente e entrada gerada!", "success")
+
     return redirect(url_for("a_receber.a_receber"))

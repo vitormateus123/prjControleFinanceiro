@@ -128,11 +128,11 @@
             <div class="parcela-numero">{{ parcela.numero }}/{{ total_parcelas }}</div>
             <div class="parcela-valor">R$ {{ "%.2f"|format(parcela.valor|float) }}</div>
             {% if not parcela.recebido %}
-              <a href="{{ url_for('a_receber.receber_parcela', parcela_id=parcela.id) }}"
-                onclick="return confirm('Confirmar recebimento e gerar entrada automática?')"
-                class="parcela-btn" title="Marcar como recebido">
+              <button type="button" class="parcela-btn border-0"
+                title="Registrar recebimento"
+                onclick="abrirModalReceber({{ parcela.id }}, {{ parcela.valor }})">
                 <i class="bi bi-check-lg"></i>
-              </a>
+              </button>
             {% else %}
               <span class="parcela-check"><i class="bi bi-check-lg"></i></span>
             {% endif %}
@@ -211,6 +211,46 @@
   </div>
 </div>
 
+<!-- MODAL DE RECEBIMENTO PARCIAL -->
+<div class="modal fade" id="modalReceber" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content" style="border-radius: var(--r-md); overflow:hidden;">
+
+      <div class="card-form-header" style="border-radius:0;">
+        <h3><i class="bi bi-cash-coin me-2"></i>Registrar Recebimento</h3>
+        <p>Informe o valor que você realmente recebeu.</p>
+        <span class="header-icon">💵</span>
+      </div>
+
+      <div class="card-body-form">
+        <form id="formReceber" method="POST" action="">
+
+          <div class="mb-4">
+            <label class="form-label">Valor recebido (R$)</label>
+            <div class="input-group">
+              <span class="input-group-text">R$</span>
+              <input type="text" id="receber-valor" name="valor_recebido"
+                class="form-control valor-monetario" required>
+            </div>
+            <div class="form-text" id="receber-hint"></div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-custom flex-fill">
+              <i class="bi bi-check2-circle me-2"></i>Confirmar
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
   function abrirModal(id, descricao, devedor, valor, parcelas, observacao) {
     document.getElementById('edit-descricao').value  = descricao
@@ -243,6 +283,30 @@ document.querySelectorAll('form').forEach(form => {
       input.value = isNaN(num) ? '' : num.toFixed(2);
     });
   });
+});
+
+function abrirModalReceber(parcelaId, valorEsperado) {
+  const input = document.getElementById('receber-valor');
+  const hint  = document.getElementById('receber-hint');
+
+  // Pré-preenche com o valor cheio da parcela
+  input.value = valorEsperado.toFixed(2).replace('.', ',');
+  hint.textContent = `Valor original da parcela: R$ ${valorEsperado.toFixed(2).replace('.', ',')}`;
+
+  document.getElementById('formReceber').action = `/a-receber/receber/${parcelaId}`;
+  new bootstrap.Modal(document.getElementById('modalReceber')).show();
+}
+
+document.getElementById('receber-valor').addEventListener('input', function () {
+  let v = this.value.replace(/\D/g, '');
+  if (!v) { this.value = ''; return; }
+  v = (parseInt(v) / 100).toFixed(2);
+  this.value = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+});
+
+document.getElementById('formReceber').addEventListener('submit', function () {
+  const input = document.getElementById('receber-valor');
+  input.value = parseFloat(input.value.replace(/\./g, '').replace(',', '.')).toFixed(2);
 });
 </script>
 
