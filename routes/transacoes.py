@@ -123,7 +123,7 @@ def transacoes(id=None):
         destino:         forma_destino_id   (nome)
     """).order("id", desc=False).execute().data
 
-    categorias = get_supabase().table("categoria").select("*").order("nome")execute().data
+    categorias = get_supabase().table("categoria").select("*").order("nome").execute().data
     formas = get_supabase().table("forma_pagamento").select("*").execute().data
 
     return render_template(
