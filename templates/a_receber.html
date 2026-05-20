@@ -33,7 +33,8 @@
               <label class="form-label">Valor total (R$)</label>
               <div class="input-group">
                 <span class="input-group-text">R$</span>
-                <input type="text" name="valor_total" class="form-control valor-monetario" placeholder="0,00" required>
+                <input type="number" name="valor_total" class="form-control"
+                  step="0.01" min="0.01" placeholder="0,00" required>
               </div>
             </div>
             <div class="col-6">
@@ -68,6 +69,7 @@
   Valores a receber
 </div>
 
+<div id="lista-a-receber">
 {% for reg in registros %}
   {% set total_parcelas = reg.parcelas | length %}
   {% set recebidas = reg.parcelas | selectattr('recebido') | list | length %}
@@ -148,6 +150,7 @@
     <p class="mt-2" style="font-size:0.9rem;">Nenhum valor a receber cadastrado.</p>
   </div>
 {% endfor %}
+</div>
 
 
 <!-- MODAL DE EDIÇÃO -->
@@ -211,7 +214,8 @@
   </div>
 </div>
 
-<!-- MODAL DE RECEBIMENTO PARCIAL -->
+
+<!-- MODAL DE RECEBIMENTO -->
 <div class="modal fade" id="modalReceber" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content" style="border-radius: var(--r-md); overflow:hidden;">
@@ -225,14 +229,24 @@
       <div class="card-body-form">
         <form id="formReceber" method="POST" action="">
 
-          <div class="mb-4">
+          <div class="mb-3">
             <label class="form-label">Valor recebido (R$)</label>
             <div class="input-group">
               <span class="input-group-text">R$</span>
               <input type="text" id="receber-valor" name="valor_recebido"
-                class="form-control valor-monetario" required>
+                class="form-control" placeholder="0,00" required>
             </div>
             <div class="form-text" id="receber-hint"></div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Categoria <span class="text-muted">(opcional)</span></label>
+            <select name="categoria_id" class="form-select">
+              <option value="">Sem categoria</option>
+              {% for cat in categorias %}
+                <option value="{{ cat.id }}">{{ cat.nome }}</option>
+              {% endfor %}
+            </select>
           </div>
 
           <div class="d-flex gap-2">
@@ -251,7 +265,9 @@
   </div>
 </div>
 
+
 <script>
+  // ── Modal de edição ───────────────────────────────────────────────
   function abrirModal(id, descricao, devedor, valor, parcelas, observacao) {
     document.getElementById('edit-descricao').value  = descricao
     document.getElementById('edit-devedor').value    = devedor
@@ -262,52 +278,88 @@
     new bootstrap.Modal(document.getElementById('modalEditar')).show()
   }
 
-function aplicarMascaraMonetaria(input) {
-  input.addEventListener('input', function () {
-    let v = this.value.replace(/\D/g, '');
-    if (!v) { this.value = ''; return; }
-    v = (parseInt(v) / 100).toFixed(2);
-    v = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    this.value = v;
-  });
-}
+  // ── Modal de recebimento ──────────────────────────────────────────
+  const inputReceber = document.getElementById('receber-valor')
 
-document.querySelectorAll('.valor-monetario').forEach(aplicarMascaraMonetaria);
+  // Máscara monetária
+  inputReceber.addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '')
+    if (!v) { this.value = ''; return }
+    v = (parseInt(v) / 100).toFixed(2)
+    this.value = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  })
 
-document.querySelectorAll('form').forEach(form => {
-  form.addEventListener('submit', function () {
-    this.querySelectorAll('.valor-monetario').forEach(input => {
-      const num = parseFloat(
-        input.value.replace(/\./g, '').replace(',', '.')
-      );
-      input.value = isNaN(num) ? '' : num.toFixed(2);
-    });
-  });
-});
+  // Converte para ponto antes de submeter
+  document.getElementById('formReceber').addEventListener('submit', function () {
+    const num = parseFloat(inputReceber.value.replace(/\./g, '').replace(',', '.'))
+    inputReceber.value = isNaN(num) ? '' : num.toFixed(2)
+  })
 
-function abrirModalReceber(parcelaId, valorEsperado) {
-  const input = document.getElementById('receber-valor');
-  const hint  = document.getElementById('receber-hint');
+  function abrirModalReceber(parcelaId, valorEsperado) {
+    // Pré-preenche com o valor cheio formatado
+    const formatado = valorEsperado.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    inputReceber.value = formatado
 
-  // Pré-preenche com o valor cheio da parcela
-  input.value = valorEsperado.toFixed(2).replace('.', ',');
-  hint.textContent = `Valor original da parcela: R$ ${valorEsperado.toFixed(2).replace('.', ',')}`;
+    document.getElementById('receber-hint').textContent =
+      `Valor original da parcela: R$ ${formatado}`
 
-  document.getElementById('formReceber').action = `/a-receber/receber/${parcelaId}`;
-  new bootstrap.Modal(document.getElementById('modalReceber')).show();
-}
+    document.getElementById('formReceber').action = `/a-receber/receber/${parcelaId}`
+    new bootstrap.Modal(document.getElementById('modalReceber')).show()
+  }
 
-document.getElementById('receber-valor').addEventListener('input', function () {
-  let v = this.value.replace(/\D/g, '');
-  if (!v) { this.value = ''; return; }
-  v = (parseInt(v) / 100).toFixed(2);
-  this.value = v.replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-});
+  // ── Paginação ─────────────────────────────────────────────────────
+  ;(function () {
+    const POR_PAGINA = 10
+    let paginaAtual  = 1
+    const lista      = document.getElementById('lista-a-receber')
+    if (!lista) return
 
-document.getElementById('formReceber').addEventListener('submit', function () {
-  const input = document.getElementById('receber-valor');
-  input.value = parseFloat(input.value.replace(/\./g, '').replace(',', '.')).toFixed(2);
-});
+    const cards = Array.from(lista.children).filter(el => el.tagName === 'DIV')
+    if (cards.length <= POR_PAGINA) return   // sem paginação se couber tudo
+
+    function totalPaginas() {
+      return Math.ceil(cards.length / POR_PAGINA)
+    }
+
+    function renderizarPagina(pg) {
+      paginaAtual  = Math.min(Math.max(1, pg), totalPaginas())
+      const inicio = (paginaAtual - 1) * POR_PAGINA
+      cards.forEach((card, i) => {
+        card.style.display = (i >= inicio && i < inicio + POR_PAGINA) ? '' : 'none'
+      })
+      renderizarControles()
+    }
+
+    function renderizarControles() {
+      let nav = document.getElementById('paginacao-a-receber')
+      if (!nav) {
+        nav = document.createElement('nav')
+        nav.id        = 'paginacao-a-receber'
+        nav.className = 'mt-3 d-flex justify-content-center'
+        lista.insertAdjacentElement('afterend', nav)
+      }
+      const total = totalPaginas()
+      let html = '<ul class="pagination pagination-sm">'
+      html += `<li class="page-item ${paginaAtual === 1 ? 'disabled' : ''}">
+                 <a class="page-link" href="#" data-pg="${paginaAtual - 1}">‹</a></li>`
+      for (let p = 1; p <= total; p++) {
+        html += `<li class="page-item ${p === paginaAtual ? 'active' : ''}">
+                   <a class="page-link" href="#" data-pg="${p}">${p}</a></li>`
+      }
+      html += `<li class="page-item ${paginaAtual === total ? 'disabled' : ''}">
+                 <a class="page-link" href="#" data-pg="${paginaAtual + 1}">›</a></li>`
+      html += '</ul>'
+      nav.innerHTML = html
+      nav.querySelectorAll('[data-pg]').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault()
+          renderizarPagina(parseInt(a.dataset.pg))
+        })
+      })
+    }
+
+    renderizarPagina(1)
+  })()
 </script>
 
 {% endblock %}

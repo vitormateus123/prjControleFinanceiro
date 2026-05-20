@@ -88,7 +88,13 @@ def a_receber(id=None):
         *, parcelas: a_receber_parcela (*)
     """).order("id", desc=True).execute().data
 
-    return render_template("a_receber.html", registros=registros, registro=registro)
+    categorias_entrada = sb.table("categoria").select("*") \
+        .eq("tipo", "entrada").order("nome").execute().data
+
+    return render_template("a_receber.html",
+        registros=registros,
+        registro=registro,
+        categorias=categorias_entrada)
 
 
 @a_receber_bp.route("/a-receber/receber/<int:parcela_id>", methods=["POST"])
@@ -113,12 +119,16 @@ def receber_parcela(parcela_id):
         flash("O valor recebido deve ser maior que zero!", "danger")
         return redirect(url_for("a_receber.a_receber"))
 
+    categoria_id = request.form.get("categoria_id")
+    categoria_id = int(categoria_id) if categoria_id else None
+
     # Gera a transação de entrada pelo valor realmente recebido
     transacao = sb.table("transacao").insert({
-        "descricao": f"{parcela['a_receber']['descricao']} ({parcela['a_receber']['devedor']})",
-        "valor":     valor_recebido,
-        "data":      datetime.date.today().isoformat(),
-        "tipo":      "entrada",
+        "descricao":    f"{parcela['a_receber']['descricao']} ({parcela['a_receber']['devedor']})",
+        "valor":        valor_recebido,
+        "data":         datetime.date.today().isoformat(),
+        "tipo":         "entrada",
+        "categoria_id": categoria_id,
     }).execute()
 
     transacao_id = transacao.data[0]["id"]
@@ -133,17 +143,16 @@ def receber_parcela(parcela_id):
     # Se recebeu menos do que o esperado, cria nova parcela com o restante
     restante = round(parcela["valor"] - valor_recebido, 2)
     if restante > 0.01:
-        a_receber_id  = parcela["a_receber"]["id"]
-        num_parcelas  = parcela["a_receber"]["num_parcelas"]
+        a_receber_id = parcela["a_receber"]["id"]
+        num_parcelas = parcela["a_receber"]["num_parcelas"]
 
         # Incrementa o total de parcelas do registro pai
         sb.table("a_receber").update({
             "num_parcelas": num_parcelas + 1
         }).eq("id", a_receber_id).execute()
 
-        # Descobre o próximo número de parcela
-        todas = sb.table("a_receber_parcela").select("numero").eq("a_receber_id", a_receber_id).execute().data
-        proximo = max(p["numero"] for p in todas) + 1
+        todas    = sb.table("a_receber_parcela").select("numero").eq("a_receber_id", a_receber_id).execute().data
+        proximo  = max(p["numero"] for p in todas) + 1
 
         sb.table("a_receber_parcela").insert({
             "a_receber_id": a_receber_id,
